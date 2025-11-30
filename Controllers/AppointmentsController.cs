@@ -15,22 +15,30 @@ namespace FitnessCenter.Web.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppointmentService _appointmentService;
+        private readonly ILogger<AppointmentsController> _logger;
 
         public AppointmentsController(
             ApplicationDbContext context, 
             UserManager<ApplicationUser> userManager,
-            AppointmentService appointmentService)
+            AppointmentService appointmentService,
+            ILogger<AppointmentsController> logger)
         {
             _context = context;
             _userManager = userManager;
             _appointmentService = appointmentService;
+            _logger = logger;
         }
 
         // GET: Appointments
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            var isAdmin = await _userManager.IsInRoleAsync(user!, "Admin");
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
 
             IQueryable<Appointment> appointmentsQuery = _context.Appointments
                 .Include(a => a.Gym)
@@ -40,7 +48,7 @@ namespace FitnessCenter.Web.Controllers
 
             if (!isAdmin)
             {
-                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == user!.Id);
+                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == user.Id);
             }
 
             // SQLite doesn't support TimeSpan in ORDER BY, so we fetch first then sort in memory
@@ -287,14 +295,69 @@ namespace FitnessCenter.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTrainers(int gymId)
+        public async Task<IActionResult> GetTrainers(int gymId, string? appointmentDate = null)
         {
-            var trainers = await _context.Trainers
-                .Where(t => t.GymId == gymId)
-                .Select(t => new { id = t.Id, fullName = t.FullName })
-                .ToListAsync();
-            
-            return Json(trainers);
+            try
+            {
+                // Önce tüm trainer'ları çek (SQLite'da TimeSpan işlemleri sorun çıkarabilir)
+                var allTrainers = await _context.Trainers
+                    .Where(t => t.GymId == gymId)
+                    .ToListAsync();
+
+                var filteredTrainers = allTrainers;
+
+                // Eğer tarih belirtilmişse, o gün çalışan trainer'ları filtrele
+                if (!string.IsNullOrEmpty(appointmentDate))
+                {
+                    DateTime date;
+                    if (DateTime.TryParse(appointmentDate, out date) || 
+                        DateTime.TryParseExact(appointmentDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out date))
+                    {
+                        var dayOfWeek = date.DayOfWeek.ToString(); // Monday, Tuesday, etc.
+                        
+                        // Bellekte filtrele (SQLite'da Contains sorun çıkarabilir)
+                        filteredTrainers = allTrainers
+                            .Where(t => !string.IsNullOrEmpty(t.WorkDays) && 
+                                       t.WorkDays.Contains(dayOfWeek, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                    }
+                }
+
+                var trainers = filteredTrainers
+                    .Select(t => new { 
+                        id = t.Id, 
+                        fullName = t.FullName,
+                        workStartTime = t.WorkStartTime.HasValue ? t.WorkStartTime.Value.ToString(@"hh\:mm") : null,
+                        workEndTime = t.WorkEndTime.HasValue ? t.WorkEndTime.Value.ToString(@"hh\:mm") : null
+                    })
+                    .ToList();
+                
+                return Json(trainers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetTrainers hatası: GymId={GymId}, Date={Date}", gymId, appointmentDate);
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTrainerWorkHours(int trainerId)
+        {
+            var trainer = await _context.Trainers.FindAsync(trainerId);
+            if (trainer == null)
+            {
+                return Json(new { error = "Antrenör bulunamadı" });
+            }
+
+            return Json(new
+            {
+                workDays = !string.IsNullOrEmpty(trainer.WorkDays) 
+                    ? trainer.WorkDays.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() 
+                    : new List<string>(),
+                workStartTime = trainer.WorkStartTime.HasValue ? trainer.WorkStartTime.Value.ToString(@"hh\:mm") : null,
+                workEndTime = trainer.WorkEndTime.HasValue ? trainer.WorkEndTime.Value.ToString(@"hh\:mm") : null
+            });
         }
 
         [HttpGet]

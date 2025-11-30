@@ -21,6 +21,14 @@ namespace FitnessCenter.Web.Models
         [StringLength(200)]
         public string? AvailableHours { get; set; }
 
+        // Çalışma günleri (Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar)
+        [StringLength(100)]
+        public string? WorkDays { get; set; } // Örn: "Monday,Wednesday,Friday" veya "Pazartesi,Çarşamba,Cuma"
+
+        // Çalışma saatleri
+        public TimeSpan? WorkStartTime { get; set; } // Örn: 09:00
+        public TimeSpan? WorkEndTime { get; set; } // Örn: 18:00
+
         [Required]
         public int GymId { get; set; }
         public Gym? Gym { get; set; }

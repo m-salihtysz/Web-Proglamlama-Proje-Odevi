@@ -69,7 +69,11 @@ namespace FitnessCenter.Web.Controllers
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
                     Specializations = viewModel.Specializations,
-                    AvailableHours = viewModel.AvailableHours,
+                    WorkDays = viewModel.WorkDays != null && viewModel.WorkDays.Any() 
+                        ? string.Join(",", viewModel.WorkDays) 
+                        : null,
+                    WorkStartTime = viewModel.WorkStartTime,
+                    WorkEndTime = viewModel.WorkEndTime,
                     GymId = viewModel.GymId
                 };
 
@@ -124,7 +128,11 @@ namespace FitnessCenter.Web.Controllers
                 FirstName = trainer.FirstName,
                 LastName = trainer.LastName,
                 Specializations = trainer.Specializations,
-                AvailableHours = trainer.AvailableHours,
+                WorkDays = !string.IsNullOrEmpty(trainer.WorkDays) 
+                    ? trainer.WorkDays.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() 
+                    : new List<string>(),
+                WorkStartTime = trainer.WorkStartTime,
+                WorkEndTime = trainer.WorkEndTime,
                 GymId = trainer.GymId,
                 ServiceIds = trainer.TrainerServices.Select(ts => ts.ServiceId).ToList()
             };
@@ -159,7 +167,11 @@ namespace FitnessCenter.Web.Controllers
                     trainer.FirstName = viewModel.FirstName;
                     trainer.LastName = viewModel.LastName;
                     trainer.Specializations = viewModel.Specializations;
-                    trainer.AvailableHours = viewModel.AvailableHours;
+                    trainer.WorkDays = viewModel.WorkDays != null && viewModel.WorkDays.Any() 
+                        ? string.Join(",", viewModel.WorkDays) 
+                        : null;
+                    trainer.WorkStartTime = viewModel.WorkStartTime;
+                    trainer.WorkEndTime = viewModel.WorkEndTime;
                     trainer.GymId = viewModel.GymId;
 
                     // Update services

@@ -20,9 +20,14 @@ namespace FitnessCenter.Web.ViewModels
         [Display(Name = "Uzmanlık Alanları")]
         public string? Specializations { get; set; }
 
-        [StringLength(200, ErrorMessage = "Müsaitlik saatleri 200 karakterden uzun olamaz")]
-        [Display(Name = "Müsaitlik Saatleri")]
-        public string? AvailableHours { get; set; }
+        [Display(Name = "Çalışma Günleri")]
+        public List<string> WorkDays { get; set; } = new List<string>();
+
+        [Display(Name = "Çalışma Başlangıç Saati")]
+        public TimeSpan? WorkStartTime { get; set; }
+
+        [Display(Name = "Çalışma Bitiş Saati")]
+        public TimeSpan? WorkEndTime { get; set; }
 
         [Required(ErrorMessage = "Spor salonu gereklidir")]
         [Display(Name = "Spor Salonu")]

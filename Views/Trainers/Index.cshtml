@@ -17,7 +17,8 @@
                     <th>Ad Soyad</th>
                     <th>Spor Salonu</th>
                     <th>Uzmanlık Alanları</th>
-                    <th>Müsaitlik Saatleri</th>
+                    <th>Çalışma Günleri</th>
+                    <th>Çalışma Saatleri</th>
                     <th>Hizmet Sayısı</th>
                     <th>İşlemler</th>
                 </tr>
@@ -29,8 +30,33 @@
                         <td><strong>@trainer.FullName</strong></td>
                         <td>@(trainer.Gym?.Name ?? "Yok")</td>
                         <td>@(trainer.Specializations ?? "Belirtilmemiş")</td>
-                        <td>@(trainer.AvailableHours ?? "Belirtilmemiş")</td>
-                        <td>@trainer.TrainerServices.Count</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(trainer.WorkDays))
+                            {
+                                var days = trainer.WorkDays.Split(',');
+                                var dayNames = new Dictionary<string, string>
+                                {
+                                    {"Monday", "Pzt"}, {"Tuesday", "Sal"}, {"Wednesday", "Çar"},
+                                    {"Thursday", "Per"}, {"Friday", "Cum"}, {"Saturday", "Cmt"}, {"Sunday", "Paz"}
+                                };
+                                @string.Join(", ", days.Select(d => dayNames.ContainsKey(d.Trim()) ? dayNames[d.Trim()] : d.Trim()))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Belirtilmemiş</span>
+                            }
+                        </td>
+                        <td>
+                            @if (trainer.WorkStartTime.HasValue && trainer.WorkEndTime.HasValue)
+                            {
+                                @($"{trainer.WorkStartTime.Value:hh\\:mm} - {trainer.WorkEndTime.Value:hh\\:mm}")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Belirtilmemiş</span>
+                            }
+                        </td>
+                        <td>@(trainer.TrainerServices?.Count ?? 0)</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <a asp-action="Details" asp-route-id="@trainer.Id" class="btn btn-sm btn-info">Detaylar</a>

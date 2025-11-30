@@ -14,8 +14,35 @@
     <dt class="col-sm-3">Adres</dt>
     <dd class="col-sm-9">@Model.Address</dd>
 
+    <dt class="col-sm-3">Çalışma Günleri</dt>
+    <dd class="col-sm-9">
+        @if (!string.IsNullOrEmpty(Model.WorkDays))
+        {
+            var days = Model.WorkDays.Split(',');
+            var dayNames = new Dictionary<string, string>
+            {
+                {"Monday", "Pazartesi"}, {"Tuesday", "Salı"}, {"Wednesday", "Çarşamba"},
+                {"Thursday", "Perşembe"}, {"Friday", "Cuma"}, {"Saturday", "Cumartesi"}, {"Sunday", "Pazar"}
+            };
+            @string.Join(", ", days.Select(d => dayNames.ContainsKey(d.Trim()) ? dayNames[d.Trim()] : d.Trim()))
+        }
+        else
+        {
+            <span class="text-muted">Belirtilmemiş</span>
+        }
+    </dd>
+
     <dt class="col-sm-3">Çalışma Saatleri</dt>
-    <dd class="col-sm-9">@(Model.WorkingHours ?? "Belirtilmemiş")</dd>
+    <dd class="col-sm-9">
+        @if (Model.WorkStartTime.HasValue && Model.WorkEndTime.HasValue)
+        {
+            @($"{Model.WorkStartTime.Value:hh\\:mm} - {Model.WorkEndTime.Value:hh\\:mm}")
+        }
+        else
+        {
+            <span class="text-muted">Belirtilmemiş</span>
+        }
+    </dd>
 
     <dt class="col-sm-3">Hizmet Sayısı</dt>
     <dd class="col-sm-9">@Model.Services.Count</dd>

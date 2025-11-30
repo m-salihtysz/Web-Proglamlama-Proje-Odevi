@@ -16,9 +16,14 @@ namespace FitnessCenter.Web.ViewModels
         [Display(Name = "Adres")]
         public string Address { get; set; } = string.Empty;
 
-        [StringLength(100, ErrorMessage = "Çalışma saatleri 100 karakterden uzun olamaz")]
-        [Display(Name = "Çalışma Saatleri")]
-        public string? WorkingHours { get; set; }
+        [Display(Name = "Çalışma Günleri")]
+        public List<string> WorkDays { get; set; } = new List<string>();
+
+        [Display(Name = "Çalışma Başlangıç Saati")]
+        public TimeSpan? WorkStartTime { get; set; }
+
+        [Display(Name = "Çalışma Bitiş Saati")]
+        public TimeSpan? WorkEndTime { get; set; }
     }
 }
 

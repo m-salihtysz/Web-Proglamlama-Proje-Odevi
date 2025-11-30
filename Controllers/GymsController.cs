@@ -20,7 +20,11 @@ namespace FitnessCenter.Web.Controllers
         // GET: Gyms
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Gyms.ToListAsync());
+            var gyms = await _context.Gyms
+                .Include(g => g.Services)
+                .Include(g => g.Trainers)
+                .ToListAsync();
+            return View(gyms);
         }
 
         // GET: Gyms/Details/5
@@ -60,7 +64,11 @@ namespace FitnessCenter.Web.Controllers
                 {
                     Name = viewModel.Name,
                     Address = viewModel.Address,
-                    WorkingHours = viewModel.WorkingHours
+                    WorkDays = viewModel.WorkDays != null && viewModel.WorkDays.Any() 
+                        ? string.Join(",", viewModel.WorkDays) 
+                        : null,
+                    WorkStartTime = viewModel.WorkStartTime,
+                    WorkEndTime = viewModel.WorkEndTime
                 };
                 _context.Add(gym);
                 await _context.SaveChangesAsync();
@@ -88,7 +96,11 @@ namespace FitnessCenter.Web.Controllers
                 Id = gym.Id,
                 Name = gym.Name,
                 Address = gym.Address,
-                WorkingHours = gym.WorkingHours
+                WorkDays = !string.IsNullOrEmpty(gym.WorkDays) 
+                    ? gym.WorkDays.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() 
+                    : new List<string>(),
+                WorkStartTime = gym.WorkStartTime,
+                WorkEndTime = gym.WorkEndTime
             };
 
             return View(viewModel);
@@ -116,7 +128,11 @@ namespace FitnessCenter.Web.Controllers
 
                     gym.Name = viewModel.Name;
                     gym.Address = viewModel.Address;
-                    gym.WorkingHours = viewModel.WorkingHours;
+                    gym.WorkDays = viewModel.WorkDays != null && viewModel.WorkDays.Any() 
+                        ? string.Join(",", viewModel.WorkDays) 
+                        : null;
+                    gym.WorkStartTime = viewModel.WorkStartTime;
+                    gym.WorkEndTime = viewModel.WorkEndTime;
 
                     _context.Update(gym);
                     await _context.SaveChangesAsync();

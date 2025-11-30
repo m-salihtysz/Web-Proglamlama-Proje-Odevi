@@ -16,6 +16,7 @@
                 <tr>
                     <th>Ad</th>
                     <th>Adres</th>
+                    <th>Çalışma Günleri</th>
                     <th>Çalışma Saatleri</th>
                     <th>Hizmet Sayısı</th>
                     <th>Antrenör Sayısı</th>
@@ -28,9 +29,34 @@
                     <tr>
                         <td><strong>@gym.Name</strong></td>
                         <td>@gym.Address</td>
-                        <td>@(gym.WorkingHours ?? "Belirtilmemiş")</td>
-                        <td>@gym.Services.Count</td>
-                        <td>@gym.Trainers.Count</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(gym.WorkDays))
+                            {
+                                var days = gym.WorkDays.Split(',');
+                                var dayNames = new Dictionary<string, string>
+                                {
+                                    {"Monday", "Pzt"}, {"Tuesday", "Sal"}, {"Wednesday", "Çar"},
+                                    {"Thursday", "Per"}, {"Friday", "Cum"}, {"Saturday", "Cmt"}, {"Sunday", "Paz"}
+                                };
+                                @string.Join(", ", days.Select(d => dayNames.ContainsKey(d.Trim()) ? dayNames[d.Trim()] : d.Trim()))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Belirtilmemiş</span>
+                            }
+                        </td>
+                        <td>
+                            @if (gym.WorkStartTime.HasValue && gym.WorkEndTime.HasValue)
+                            {
+                                @($"{gym.WorkStartTime.Value:hh\\:mm} - {gym.WorkEndTime.Value:hh\\:mm}")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Belirtilmemiş</span>
+                            }
+                        </td>
+                        <td>@(gym.Services?.Count ?? 0)</td>
+                        <td>@(gym.Trainers?.Count ?? 0)</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <a asp-action="Details" asp-route-id="@gym.Id" class="btn btn-sm btn-info">Detaylar</a>

@@ -37,14 +37,16 @@
 
             <div class="mb-3">
                 <label asp-for="AppointmentDate" class="form-label"></label>
-                <input asp-for="AppointmentDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <input asp-for="AppointmentDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" id="appointmentDate" />
                 <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                <small class="form-text text-muted">Tarih seçildiğinde o gün çalışan antrenörler gösterilecektir.</small>
             </div>
 
             <div class="mb-3">
                 <label asp-for="AppointmentTime" class="form-label"></label>
-                <input asp-for="AppointmentTime" class="form-control" type="time" />
+                <input asp-for="AppointmentTime" class="form-control" type="time" id="appointmentTime" />
                 <span asp-validation-for="AppointmentTime" class="text-danger"></span>
+                <small class="form-text text-muted" id="workHoursInfo">Antrenör seçildiğinde çalışma saatleri gösterilecektir.</small>
             </div>
 
             <div class="mb-3">
@@ -59,30 +61,93 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function() {
-            $('#gymSelect').change(function() {
-                var gymId = $(this).val();
-                if (gymId) {
+            function loadTrainers() {
+                var gymId = $('#gymSelect').val();
+                var appointmentDate = $('#appointmentDate').val();
+                
+                if (gymId && appointmentDate) {
                     $.ajax({
                         url: '@Url.Action("GetTrainers", "Appointments")',
                         type: 'GET',
-                        data: { gymId: gymId },
+                        data: { gymId: gymId, appointmentDate: appointmentDate },
                         success: function(data) {
                             $('#trainerSelect').empty().append('<option value="">-- Antrenör Seçin --</option>');
-                            $.each(data, function(i, trainer) {
-                                $('#trainerSelect').append($('<option></option>').val(trainer.id).text(trainer.fullName));
-                            });
-                            $('#trainerSelect').prop('disabled', false);
+                            if (data.length === 0) {
+                                $('#trainerSelect').append('<option value="" disabled>Bu tarihte çalışan antrenör bulunmamaktadır.</option>');
+                                $('#trainerSelect').prop('disabled', true);
+                            } else {
+                                $.each(data, function(i, trainer) {
+                                    var timeInfo = '';
+                                    if (trainer.workStartTime && trainer.workEndTime) {
+                                        timeInfo = ' (Çalışma: ' + trainer.workStartTime + ' - ' + trainer.workEndTime + ')';
+                                    }
+                                    $('#trainerSelect').append($('<option></option>')
+                                        .val(trainer.id)
+                                        .text(trainer.fullName + timeInfo)
+                                        .data('workStartTime', trainer.workStartTime)
+                                        .data('workEndTime', trainer.workEndTime));
+                                });
+                                $('#trainerSelect').prop('disabled', false);
+                            }
                             $('#serviceSelect').empty().append('<option value="">-- Hizmet Seçin --</option>').prop('disabled', true);
+                            $('#appointmentTime').val('');
+                            $('#workHoursInfo').text('Antrenör seçildiğinde çalışma saatleri gösterilecektir.');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Trainer yükleme hatası:', {
+                                status: status,
+                                error: error,
+                                responseText: xhr.responseText,
+                                statusCode: xhr.status
+                            });
+                            
+                            var errorMsg = 'Hata oluştu';
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                errorMsg = xhr.responseJSON.error;
+                            } else if (xhr.status === 0) {
+                                errorMsg = 'Sunucuya bağlanılamadı';
+                            } else if (xhr.status === 500) {
+                                errorMsg = 'Sunucu hatası';
+                            }
+                            
+                            $('#trainerSelect').empty().append('<option value="" disabled>-- ' + errorMsg + ' --</option>').prop('disabled', true);
                         }
                     });
+                } else if (gymId) {
+                    // Sadece gym seçilmişse, tarih seçilene kadar bekle
+                    $('#trainerSelect').empty().append('<option value="">-- Önce tarih seçin --</option>').prop('disabled', true);
+                    $('#serviceSelect').empty().append('<option value="">-- Hizmet Seçin --</option>').prop('disabled', true);
                 } else {
                     $('#trainerSelect').empty().append('<option value="">-- Antrenör Seçin --</option>').prop('disabled', true);
                     $('#serviceSelect').empty().append('<option value="">-- Hizmet Seçin --</option>').prop('disabled', true);
                 }
+            }
+
+            $('#gymSelect').change(function() {
+                loadTrainers();
+            });
+
+            $('#appointmentDate').change(function() {
+                loadTrainers();
             });
 
             $('#trainerSelect').change(function() {
                 var trainerId = $(this).val();
+                var selectedOption = $(this).find('option:selected');
+                var workStartTime = selectedOption.data('workStartTime');
+                var workEndTime = selectedOption.data('workEndTime');
+                
+                // Çalışma saatlerini göster
+                if (workStartTime && workEndTime) {
+                    $('#workHoursInfo').text('Çalışma saatleri: ' + workStartTime + ' - ' + workEndTime);
+                    $('#appointmentTime').attr('min', workStartTime);
+                    $('#appointmentTime').attr('max', workEndTime);
+                } else {
+                    $('#workHoursInfo').text('Bu antrenör için çalışma saatleri belirtilmemiş.');
+                    $('#appointmentTime').removeAttr('min');
+                    $('#appointmentTime').removeAttr('max');
+                }
+                
                 if (trainerId) {
                     $.ajax({
                         url: '@Url.Action("GetServices", "Appointments")',
@@ -98,6 +163,7 @@
                     });
                 } else {
                     $('#serviceSelect').empty().append('<option value="">-- Hizmet Seçin --</option>').prop('disabled', true);
+                    $('#workHoursInfo').text('Antrenör seçildiğinde çalışma saatleri gösterilecektir.');
                 }
             });
         });

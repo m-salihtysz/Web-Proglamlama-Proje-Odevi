@@ -60,6 +60,32 @@ namespace FitnessCenter.Web.Data
                 .WithMany(s => s.Appointments)
                 .HasForeignKey(a => a.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure TimeSpan columns for SQLite
+            builder.Entity<Trainer>()
+                .Property(t => t.WorkStartTime)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToString(@"hh\:mm\:ss") : null,
+                    v => !string.IsNullOrEmpty(v) ? TimeSpan.Parse(v) : null);
+
+            builder.Entity<Trainer>()
+                .Property(t => t.WorkEndTime)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToString(@"hh\:mm\:ss") : null,
+                    v => !string.IsNullOrEmpty(v) ? TimeSpan.Parse(v) : null);
+
+            // Configure TimeSpan columns for Gym
+            builder.Entity<Gym>()
+                .Property(g => g.WorkStartTime)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToString(@"hh\:mm\:ss") : null,
+                    v => !string.IsNullOrEmpty(v) ? TimeSpan.Parse(v) : null);
+
+            builder.Entity<Gym>()
+                .Property(g => g.WorkEndTime)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToString(@"hh\:mm\:ss") : null,
+                    v => !string.IsNullOrEmpty(v) ? TimeSpan.Parse(v) : null);
         }
     }
 }

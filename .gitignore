@@ -52,9 +52,10 @@ artifacts/
 # macOS
 .DS_Store
 
-# User secrets
+# User secrets and configuration files with sensitive data
 appsettings.Development.json
 appsettings.Production.json
+appsettings.json
 
 # Temporary files
 *.tmp

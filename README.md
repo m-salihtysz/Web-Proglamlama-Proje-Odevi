@@ -13,7 +13,7 @@ Sistem **rol tabanlı yetkilendirme** ile çalışır:
 - ✅ Rol tabanlı yetkilendirme (Admin/Üye)
 - ✅ Spor salonu, antrenör ve hizmet yönetimi
 - ✅ Randevu sistemi (oluşturma, onaylama, reddetme)
-- ✅ OpenAI API entegrasyonu ile AI önerileri
+- ✅ Google Gemini API entegrasyonu ile AI önerileri
 - ✅ Türkçe arayüz
 - ✅ SQLite veritabanı
 
@@ -24,6 +24,22 @@ dotnet restore
 dotnet run
 ```
 
+## Yapılandırma
+
+### Google AI (Gemini) API Anahtarı
+
+1. [Google AI Studio](https://aistudio.google.com/app/apikey) adresinden API anahtarı alın
+2. `appsettings.Development.json` dosyası oluşturun (veya mevcut dosyayı düzenleyin):
+```json
+{
+  "GoogleAI": {
+    "ApiKey": "YOUR_API_KEY_HERE"
+  }
+}
+```
+
+**Not:** `appsettings.json` dosyası `.gitignore`'da olduğu için git'e commit edilmez. API anahtarınız güvende kalır.
+
 ## Varsayılan Admin Bilgileri
 
 - **E-posta:** `ogrencinumarasi@sakarya.edu.tr`
@@ -33,4 +49,4 @@ Admin kullanıcısı uygulama ilk çalıştırıldığında otomatik oluşturulu
 
 ## Teknolojiler
 
-.NET 8.0, ASP.NET Core MVC, Entity Framework Core, SQLite, ASP.NET Core Identity, OpenAI API
+.NET 8.0, ASP.NET Core MVC, Entity Framework Core, SQLite, ASP.NET Core Identity, Google Gemini API

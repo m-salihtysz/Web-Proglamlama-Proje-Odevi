@@ -33,27 +33,19 @@ namespace FitnessCenter.Web.Controllers
 
             try
             {
-                if (viewModel.Photo != null && viewModel.Photo.Length > 0)
+                if (!viewModel.Height.HasValue || !viewModel.Weight.HasValue)
                 {
-                    var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsFromImageAsync(viewModel.Photo);
-                    viewModel.ExerciseRecommendations = exerciseRecs;
-                    viewModel.DietSuggestions = dietRecs;
-                }
-                else if (viewModel.Height.HasValue || viewModel.Weight.HasValue || !string.IsNullOrEmpty(viewModel.BodyType))
-                {
-                    var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsAsync(
-                        viewModel.Height, 
-                        viewModel.Weight, 
-                        viewModel.BodyType, 
-                        viewModel.FitnessGoals);
-                    viewModel.ExerciseRecommendations = exerciseRecs;
-                    viewModel.DietSuggestions = dietRecs;
-                }
-                else
-                {
-                    viewModel.ErrorMessage = "Lütfen bir fotoğraf yükleyin veya vücut ölçülerinizi (boy, kilo, vücut tipi) girin.";
+                    viewModel.ErrorMessage = "Lütfen boy ve kilo bilgilerinizi girin.";
                     return View(viewModel);
                 }
+
+                var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsAsync(
+                    viewModel.Height, 
+                    viewModel.Weight, 
+                    viewModel.BodyType, 
+                    viewModel.FitnessGoals);
+                viewModel.ExerciseRecommendations = exerciseRecs;
+                viewModel.DietSuggestions = dietRecs;
             }
             catch (Exception ex)
             {

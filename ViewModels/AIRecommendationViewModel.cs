@@ -4,13 +4,12 @@ namespace FitnessCenter.Web.ViewModels
 {
     public class AIRecommendationViewModel
     {
-        [Display(Name = "Fotoğraf Yükle")]
-        public IFormFile? Photo { get; set; }
-
+        [Required(ErrorMessage = "Boy bilgisi zorunludur")]
         [Range(50, 250, ErrorMessage = "Boy 50 ile 250 cm arasında olmalıdır")]
         [Display(Name = "Boy (cm)")]
         public decimal? Height { get; set; }
 
+        [Required(ErrorMessage = "Kilo bilgisi zorunludur")]
         [Range(20, 300, ErrorMessage = "Kilo 20 ile 300 kg arasında olmalıdır")]
         [Display(Name = "Kilo (kg)")]
         public decimal? Weight { get; set; }

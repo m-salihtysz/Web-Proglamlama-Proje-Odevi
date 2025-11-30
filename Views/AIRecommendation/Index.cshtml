@@ -5,7 +5,7 @@
 
 <div class="container">
     <h2 class="mb-4">🏋️ Yapay Zeka ile Kişisel Öneriler</h2>
-    <p class="lead">Fotoğraf yükleyerek veya vücut ölçülerinizi girerek size özel egzersiz ve diyet planı alın.</p>
+    <p class="lead">Vücut ölçülerinizi girerek size özel egzersiz ve diyet planı alın.</p>
 
     <div class="row">
         <div class="col-md-8">
@@ -14,23 +14,11 @@
                     <h4>Bilgilerinizi Girin</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Index" method="post" enctype="multipart/form-data">
+                    <form asp-action="Index" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-4">
-                            <h5>📸 Yöntem 1: Fotoğraf Yükle</h5>
-                            <div class="mb-3">
-                                <label asp-for="Photo" class="form-label">Vücut Fotoğrafı Yükle</label>
-                                <input asp-for="Photo" type="file" class="form-control" accept="image/*" />
-                                <small class="form-text text-muted">Fotoğrafınızı yükleyerek analiz yapabilirsiniz.</small>
-                                <span asp-validation-for="Photo" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <hr />
-
-                        <div class="mb-4">
-                            <h5>📏 Yöntem 2: Ölçülerinizi Girin</h5>
+                            <h5>📏 Vücut Ölçülerinizi Girin</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label asp-for="Height" class="form-label">Boy (cm)</label>
@@ -85,10 +73,10 @@
                 <div class="card-body">
                     <h5>💡 Nasıl Çalışır?</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2">📸 <strong>Fotoğraf:</strong> Vücut fotoğrafınızı yükleyin</li>
                         <li class="mb-2">📏 <strong>Ölçüler:</strong> Boy, kilo ve vücut tipinizi girin</li>
                         <li class="mb-2">🎯 <strong>Hedefler:</strong> Fitness hedeflerinizi belirtin</li>
-                        <li class="mb-2">🤖 <strong>AI Analiz:</strong> Yapay zeka size özel plan oluşturur</li>
+                        <li class="mb-2">🤖 <strong>AI Analiz:</strong> OpenAI GPT-4o-mini modeli size özel plan oluşturur</li>
+                        <li class="mb-2">💪 <strong>Sonuç:</strong> Kişiselleştirilmiş egzersiz ve diyet önerileri alın</li>
                     </ul>
                 </div>
             </div>

@@ -55,6 +55,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddControllersWithViews();
 
+// Add HttpClient for AI service
+builder.Services.AddHttpClient();
+
 // Register custom services
 builder.Services.AddScoped<AIService>();
 builder.Services.AddScoped<AppointmentService>();

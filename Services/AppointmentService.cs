@@ -18,13 +18,20 @@ namespace FitnessCenter.Web.Services
             var appointmentDateTime = appointmentDate.Date.Add(appointmentTime);
             var endTime = appointmentDateTime.AddMinutes(durationMinutes);
 
-            var conflictingAppointments = await _context.Appointments
+            // SQLite doesn't support DateTime.Add in LINQ queries, so fetch first then filter in memory
+            var appointments = await _context.Appointments
                 .Where(a => a.TrainerId == trainerId
                     && a.Status != AppointmentStatus.Cancelled
-                    && a.Id != excludeAppointmentId
-                    && ((a.AppointmentDate.Date.Add(a.AppointmentTime) < endTime
-                        && a.AppointmentDate.Date.Add(a.AppointmentTime).AddMinutes(a.DurationMinutes) > appointmentDateTime)))
-                .AnyAsync();
+                    && a.Id != excludeAppointmentId)
+                .ToListAsync();
+
+            var conflictingAppointments = appointments
+                .Any(a =>
+                {
+                    var existingStart = a.AppointmentDate.Date.Add(a.AppointmentTime);
+                    var existingEnd = existingStart.AddMinutes(a.DurationMinutes);
+                    return existingStart < endTime && existingEnd > appointmentDateTime;
+                });
 
             return !conflictingAppointments;
         }

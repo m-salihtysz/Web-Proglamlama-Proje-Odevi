@@ -8,14 +8,14 @@
 {
     @if (isAdmin)
     {
-        <div class="text-center mb-4">
+        <div class="text-center mb-4 app-dashboard-header">
             <h1 class="display-4">👨‍💼 Admin Paneli</h1>
             <p class="lead">Spor salonu yönetim sistemini yönetin</p>
         </div>
 
         <div class="row mt-4">
             <div class="col-md-4 mb-4">
-                <div class="card border-primary h-100">
+                <div class="card app-dashboard-card h-100">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">🏋️ Spor Salonları</h2>
                         <p class="card-text">Spor salonlarını ekleyin, düzenleyin ve yönetin.</p>
@@ -30,7 +30,7 @@
             </div>
 
             <div class="col-md-4 mb-4">
-                <div class="card border-success h-100">
+                <div class="card app-dashboard-card h-100">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">👨‍🏫 Antrenörler</h2>
                         <p class="card-text">Antrenörleri ekleyin, düzenleyin ve yönetin.</p>
@@ -45,7 +45,7 @@
             </div>
 
             <div class="col-md-4 mb-4">
-                <div class="card border-info h-100">
+                <div class="card app-dashboard-card h-100">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">💼 Hizmetler</h2>
                         <p class="card-text">Hizmetleri ekleyin, düzenleyin ve yönetin.</p>
@@ -60,7 +60,7 @@
             </div>
 
             <div class="col-md-12 mb-4">
-                <div class="card border-warning">
+                <div class="card app-dashboard-card">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">📋 Tüm Randevular</h2>
                         <p class="card-text">Sistemdeki tüm randevuları görüntüleyin ve yönetin.</p>
@@ -74,14 +74,14 @@
     }
     else if (isMember)
     {
-        <div class="text-center mb-4">
+        <div class="text-center mb-4 app-dashboard-header">
             <h1 class="display-4">👤 Üye Paneli</h1>
             <p class="lead">Randevularınızı yönetin ve kişiselleştirilmiş öneriler alın</p>
         </div>
 
         <div class="row mt-4">
             <div class="col-md-6 mb-4">
-                <div class="card border-primary h-100">
+                <div class="card app-dashboard-card h-100">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">📅 Randevu Al</h2>
                         <p class="card-text">Uygun antrenör ve hizmete göre yeni randevu oluşturun.</p>
@@ -93,7 +93,7 @@
             </div>
 
             <div class="col-md-6 mb-4">
-                <div class="card border-success h-100">
+                <div class="card app-dashboard-card h-100">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">📋 Randevularım</h2>
                         <p class="card-text">Randevularınızı görüntüleyin ve yönetin.</p>
@@ -105,7 +105,7 @@
             </div>
 
             <div class="col-md-12 mb-4">
-                <div class="card border-info">
+                <div class="card app-dashboard-card">
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">🤖 Yapay Zeka Önerileri</h2>
                         <p class="card-text">Fotoğraf yükleyerek veya vücut ölçülerinizi girerek kişiselleştirilmiş egzersiz ve diyet planı alın.</p>

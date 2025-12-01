@@ -32,7 +32,8 @@ namespace FitnessCenter.Web.Services
                 }
 
                 var prompt = new StringBuilder();
-                prompt.AppendLine("Sen bir fitness ve beslenme uzmanısın. Aşağıdaki bilgilere göre kişiselleştirilmiş öneriler sun. TÜM CEVAPLARINI TÜRKÇE VER:");
+                prompt.AppendLine("Sen deneyimli bir fitness ve beslenme uzmanısın. Aşağıdaki bilgilere göre kişiselleştirilmiş, motive edici ve anlaşılır öneriler sun. TÜM CEVAPLARINI TÜRKÇE VER.");
+                prompt.AppendLine("Kullanıcıyı asla azarlama veya yargılama. Ölçüler gerçekçi olmasa bile nazikçe kısa bir uyarı yapabilirsin ama mutlaka örnek, mantıklı bir yetişkin programı yaz.");
                 
                 if (height.HasValue)
                     prompt.AppendLine($"Boy: {height} cm");
@@ -44,10 +45,12 @@ namespace FitnessCenter.Web.Services
                     prompt.AppendLine($"Fitness Hedefleri: {fitnessGoals}");
 
                 prompt.AppendLine("\nLütfen şunları sağla:");
-                prompt.AppendLine("1. Egzersiz önerileri (spesifik egzersizler, set, tekrar, sıklık)");
-                prompt.AppendLine("2. Diyet önerileri (yemek planları, makro besinler, kalori alımı)");
-                prompt.AppendLine("3. Hangi egzersizleri yapınca nasıl görüneceğine dair açıklama");
-                prompt.AppendLine("\nCevabını JSON formatında ver, iki alan içersin: 'exerciseRecommendations' ve 'dietSuggestions'. TÜM CEVAPLAR TÜRKÇE OLMALI.");
+                prompt.AppendLine("1. Egzersiz önerileri: Bölgesel çalışma (ör. tam vücut, üst vücut, alt vücut), spesifik hareket isimleri, set/tekrar sayıları ve haftalık sıklık.");
+                prompt.AppendLine("2. Diyet önerileri: Kahvaltı, öğle, akşam ve ara öğünler için örnek menüler; genel kalori ve makro tavsiyeleri.");
+                prompt.AppendLine("3. Metin tarzı: Kısa başlıklar ve madde işaretleri kullan, okunması kolay ve motive edici olsun.");
+                prompt.AppendLine("\nSADECE TEK BİR JSON NESNESİ DÖN:");
+                prompt.AppendLine("{ \"exerciseRecommendations\": \"...\", \"dietSuggestions\": \"...\" }");
+                prompt.AppendLine("Başına veya sonuna açıklama, açıklama cümlesi, ```json gibi kod bloğu işaretleri ekleme.");
 
                 // Gemini API request
                 var requestBody = new
@@ -196,7 +199,24 @@ namespace FitnessCenter.Web.Services
                             parts.GetArrayLength() > 0)
                         {
                             var text = parts[0].GetProperty("text").GetString() ?? "";
-                            
+
+                            // Çıktı bazen ```json kod bloğu içinde gelebilir, o yüzden temizle
+                            text = text.Trim();
+                            if (text.StartsWith("```"))
+                            {
+                                var firstFence = text.IndexOf("```", StringComparison.Ordinal);
+                                var secondFence = text.IndexOf("```", firstFence + 3, StringComparison.Ordinal);
+                                if (secondFence > firstFence)
+                                {
+                                    text = text.Substring(firstFence + 3, secondFence - firstFence - 3);
+                                }
+                                text = text.Trim();
+                                if (text.StartsWith("json", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    text = text.Substring(4).TrimStart();
+                                }
+                            }
+
                             // Try to parse JSON response
                             try
                             {
@@ -207,19 +227,19 @@ namespace FitnessCenter.Web.Services
                                 var dietRecs = resultDoc.RootElement.TryGetProperty("dietSuggestions", out var diet) 
                                     ? diet.GetString() ?? "Diyet önerileri mevcut değil."
                                     : "Diyet önerileri mevcut değil.";
-                                
-                                return (exerciseRecs, dietRecs);
-                            }
-                            catch
-                            {
-                                // If not JSON, split the response
+                        
+                        return (exerciseRecs, dietRecs);
+                    }
+                    catch
+                    {
+                        // If not JSON, split the response
                                 var partsArray = text.Split(new[] { "Diyet", "diet", "DIET", "Beslenme", "beslenme", "\n\nDiyet", "\n\nBeslenme" }, StringSplitOptions.None);
                                 var exerciseRecs = partsArray.Length > 0 ? partsArray[0].Trim() : text;
                                 var dietRecs = partsArray.Length > 1 ? partsArray[1].Trim() : "Diyet önerileri mevcut değil.";
-                                
-                                return (exerciseRecs, dietRecs);
-                            }
-                        }
+                        
+                        return (exerciseRecs, dietRecs);
+                    }
+                }
                     }
                 }
                 else

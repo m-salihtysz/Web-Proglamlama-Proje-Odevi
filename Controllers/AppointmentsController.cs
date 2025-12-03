@@ -29,16 +29,10 @@ namespace FitnessCenter.Web.Controllers
             _logger = logger;
         }
 
-        // GET: Appointments
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = await _userManager.IsInRoleAsync(user!, "Admin");
 
             IQueryable<Appointment> appointmentsQuery = _context.Appointments
                 .Include(a => a.Gym)
@@ -48,10 +42,9 @@ namespace FitnessCenter.Web.Controllers
 
             if (!isAdmin)
             {
-                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == user.Id);
+                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == user!.Id);
             }
 
-            // SQLite doesn't support TimeSpan in ORDER BY, so we fetch first then sort in memory
             var appointments = await appointmentsQuery.ToListAsync();
             appointments = appointments
                 .OrderByDescending(a => a.AppointmentDate)
@@ -61,7 +54,6 @@ namespace FitnessCenter.Web.Controllers
             return View(appointments);
         }
 
-        // GET: Appointments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -92,7 +84,6 @@ namespace FitnessCenter.Web.Controllers
             return View(appointment);
         }
 
-        // GET: Appointments/Create
         [Authorize(Roles = "Member")]
         public async Task<IActionResult> Create()
         {
@@ -102,7 +93,6 @@ namespace FitnessCenter.Web.Controllers
             return View();
         }
 
-        // POST: Appointments/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Member")]
@@ -120,7 +110,6 @@ namespace FitnessCenter.Web.Controllers
                     return View(viewModel);
                 }
 
-                var appointmentDateTime = viewModel.AppointmentDate.Date.Add(viewModel.AppointmentTime);
                 var isAvailable = await _appointmentService.IsSlotAvailableAsync(
                     viewModel.TrainerId, 
                     viewModel.AppointmentDate, 
@@ -156,7 +145,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Appointments/Approve/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Approve(int? id)
         {
@@ -180,7 +168,6 @@ namespace FitnessCenter.Web.Controllers
             return View(appointment);
         }
 
-        // POST: Appointments/Approve/5
         [HttpPost, ActionName("Approve")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -198,7 +185,6 @@ namespace FitnessCenter.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Appointments/Reject/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Reject(int? id)
         {
@@ -222,7 +208,6 @@ namespace FitnessCenter.Web.Controllers
             return View(appointment);
         }
 
-        // POST: Appointments/Reject/5
         [HttpPost, ActionName("Reject")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -239,7 +224,6 @@ namespace FitnessCenter.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Appointments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -270,7 +254,6 @@ namespace FitnessCenter.Web.Controllers
             return View(appointment);
         }
 
-        // POST: Appointments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -299,31 +282,22 @@ namespace FitnessCenter.Web.Controllers
         {
             try
             {
-                // Önce tüm trainer'ları çek (SQLite'da TimeSpan işlemleri sorun çıkarabilir)
                 var allTrainers = await _context.Trainers
                     .Where(t => t.GymId == gymId)
                     .ToListAsync();
 
-                var filteredTrainers = allTrainers;
-
-                // Eğer tarih belirtilmişse, o gün çalışan trainer'ları filtrele
-                if (!string.IsNullOrEmpty(appointmentDate))
+                if (!string.IsNullOrEmpty(appointmentDate) && 
+                    (DateTime.TryParse(appointmentDate, out var date) || 
+                     DateTime.TryParseExact(appointmentDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out date)))
                 {
-                    DateTime date;
-                    if (DateTime.TryParse(appointmentDate, out date) || 
-                        DateTime.TryParseExact(appointmentDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out date))
-                    {
-                        var dayOfWeek = date.DayOfWeek.ToString(); // Monday, Tuesday, etc.
-                        
-                        // Bellekte filtrele (SQLite'da Contains sorun çıkarabilir)
-                        filteredTrainers = allTrainers
-                            .Where(t => !string.IsNullOrEmpty(t.WorkDays) && 
-                                       t.WorkDays.Contains(dayOfWeek, StringComparison.OrdinalIgnoreCase))
-                            .ToList();
-                    }
+                    var dayOfWeek = date.DayOfWeek.ToString();
+                    allTrainers = allTrainers
+                        .Where(t => !string.IsNullOrEmpty(t.WorkDays) && 
+                                   t.WorkDays.Contains(dayOfWeek, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
 
-                var trainers = filteredTrainers
+                var trainers = allTrainers
                     .Select(t => new { 
                         id = t.Id, 
                         fullName = t.FullName,
@@ -374,8 +348,9 @@ namespace FitnessCenter.Web.Controllers
             }
             
             var services = trainer.TrainerServices
+                .Where(ts => ts.Service != null)
                 .Select(ts => new { 
-                    id = ts.Service.Id, 
+                    id = ts.Service!.Id, 
                     name = ts.Service.Name,
                     price = ts.Service.Price,
                     durationMinutes = ts.Service.DurationMinutes

@@ -17,7 +17,6 @@ namespace FitnessCenter.Web.Controllers
             _context = context;
         }
 
-        // GET: Trainers
         public async Task<IActionResult> Index()
         {
             var trainers = await _context.Trainers
@@ -28,7 +27,6 @@ namespace FitnessCenter.Web.Controllers
             return View(trainers);
         }
 
-        // GET: Trainers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -49,7 +47,6 @@ namespace FitnessCenter.Web.Controllers
             return View(trainer);
         }
 
-        // GET: Trainers/Create
         public async Task<IActionResult> Create()
         {
             ViewData["GymId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Gyms.ToListAsync(), "Id", "Name");
@@ -57,7 +54,6 @@ namespace FitnessCenter.Web.Controllers
             return View();
         }
 
-        // POST: Trainers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TrainerViewModel viewModel)
@@ -80,7 +76,6 @@ namespace FitnessCenter.Web.Controllers
                 _context.Add(trainer);
                 await _context.SaveChangesAsync();
 
-                // Add services
                 if (viewModel.ServiceIds != null && viewModel.ServiceIds.Any())
                 {
                     foreach (var serviceId in viewModel.ServiceIds)
@@ -105,7 +100,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Trainers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -142,7 +136,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // POST: Trainers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TrainerViewModel viewModel)
@@ -174,7 +167,6 @@ namespace FitnessCenter.Web.Controllers
                     trainer.WorkEndTime = viewModel.WorkEndTime;
                     trainer.GymId = viewModel.GymId;
 
-                    // Update services
                     var existingServices = trainer.TrainerServices.Select(ts => ts.ServiceId).ToList();
                     var servicesToRemove = existingServices.Except(viewModel.ServiceIds ?? new List<int>()).ToList();
                     var servicesToAdd = (viewModel.ServiceIds ?? new List<int>()).Except(existingServices).ToList();
@@ -203,14 +195,12 @@ namespace FitnessCenter.Web.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TrainerExists(viewModel.Id))
+                    var trainer = await _context.Trainers.FindAsync(id);
+                    if (trainer == null)
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -219,7 +209,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Trainers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -238,7 +227,6 @@ namespace FitnessCenter.Web.Controllers
             return View(trainer);
         }
 
-        // POST: Trainers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -253,10 +241,6 @@ namespace FitnessCenter.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TrainerExists(int id)
-        {
-            return _context.Trainers.Any(e => e.Id == id);
-        }
     }
 }
 

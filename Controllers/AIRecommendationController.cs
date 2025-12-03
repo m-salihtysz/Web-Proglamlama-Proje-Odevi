@@ -15,13 +15,11 @@ namespace FitnessCenter.Web.Controllers
             _aiService = aiService;
         }
 
-        // GET: AIRecommendation
         public IActionResult Index()
         {
             return View(new AIRecommendationViewModel());
         }
 
-        // POST: AIRecommendation
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(AIRecommendationViewModel viewModel)

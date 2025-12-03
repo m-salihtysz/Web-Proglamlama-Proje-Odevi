@@ -58,7 +58,7 @@ namespace FitnessCenter.Web.Services
             
             return await _context.Trainers
                 .Include(t => t.Gym)
-                .Where(t => t.AvailableHours != null && t.AvailableHours.Contains(dayOfWeek))
+                .Where(t => t.WorkDays != null && t.WorkDays.Contains(dayOfWeek))
                 .ToListAsync();
         }
     }

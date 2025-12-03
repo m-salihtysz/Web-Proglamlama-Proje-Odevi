@@ -25,7 +25,6 @@ namespace FitnessCenter.Web.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
@@ -33,7 +32,6 @@ namespace FitnessCenter.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
             {
@@ -47,7 +45,7 @@ namespace FitnessCenter.Web.Controllers
 
                 // Sign in using username (Identity uses username for PasswordSignInAsync)
                 var result = await _signInManager.PasswordSignInAsync(
-                    user.UserName,
+                    user.UserName ?? string.Empty,
                     model.Password,
                     model.RememberMe,
                     lockoutOnFailure: false);
@@ -56,14 +54,6 @@ namespace FitnessCenter.Web.Controllers
                 {
                     _logger.LogInformation("User logged in: {Email}", model.Email);
                     return RedirectToLocal(returnUrl);
-                }
-                else if (result.IsLockedOut)
-                {
-                    ModelState.AddModelError(string.Empty, "Hesabınız kilitlendi. Lütfen daha sonra tekrar deneyin.");
-                }
-                else if (result.IsNotAllowed)
-                {
-                    ModelState.AddModelError(string.Empty, "Giriş yapmanıza izin verilmiyor. E-posta adresinizi doğrulamanız gerekebilir.");
                 }
                 else
                 {
@@ -78,7 +68,6 @@ namespace FitnessCenter.Web.Controllers
         [HttpGet]
         public IActionResult Register(string? returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
@@ -86,7 +75,6 @@ namespace FitnessCenter.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
             {
@@ -103,9 +91,6 @@ namespace FitnessCenter.Web.Controllers
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
-
-                    // Add user to Member role by default
                     var memberRoleExists = await _userManager.GetRolesAsync(user);
                     if (!memberRoleExists.Contains("Member"))
                     {
@@ -138,14 +123,9 @@ namespace FitnessCenter.Web.Controllers
 
         private IActionResult RedirectToLocal(string? returnUrl)
         {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
+            return Url.IsLocalUrl(returnUrl) 
+                ? Redirect(returnUrl) 
+                : RedirectToAction(nameof(HomeController.Index), "Home");
         }
     }
 }

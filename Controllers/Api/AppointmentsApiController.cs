@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessCenter.Web.Data;
@@ -14,18 +15,33 @@ namespace FitnessCenter.Web.Controllers.Api
     {
         private readonly ApplicationDbContext _context;
         private readonly AppointmentService _appointmentService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppointmentsApiController(ApplicationDbContext context, AppointmentService appointmentService)
+        public AppointmentsApiController(
+            ApplicationDbContext context, 
+            AppointmentService appointmentService,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _appointmentService = appointmentService;
+            _userManager = userManager;
         }
 
-        // GET: api/AppointmentsApi/member/{memberId}
         [HttpGet("member/{memberId}")]
         public async Task<ActionResult<IEnumerable<object>>> GetMemberAppointments(string memberId)
         {
-            // SQLite doesn't support TimeSpan in ORDER BY, so we fetch first then sort in memory
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            if (!isAdmin && currentUser.Id != memberId)
+            {
+                return Forbid("You can only access your own appointments.");
+            }
+
             var appointments = await _context.Appointments
                 .Include(a => a.Gym)
                 .Include(a => a.Trainer)
@@ -57,17 +73,31 @@ namespace FitnessCenter.Web.Controllers.Api
             return Ok(result);
         }
 
-        // GET: api/AppointmentsApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAppointments()
         {
-            // SQLite doesn't support TimeSpan in ORDER BY, so we fetch first then sort in memory
-            var appointments = await _context.Appointments
+            // Get current user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            
+            IQueryable<Appointment> appointmentsQuery = _context.Appointments
                 .Include(a => a.Gym)
                 .Include(a => a.Trainer)
                 .Include(a => a.Service)
-                .Include(a => a.Member)
-                .ToListAsync();
+                .Include(a => a.Member);
+
+            if (!isAdmin)
+            {
+                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == currentUser.Id);
+            }
+
+            // SQLite doesn't support TimeSpan in ORDER BY, so we fetch first then sort in memory
+            var appointments = await appointmentsQuery.ToListAsync();
 
             var result = appointments
                 .OrderByDescending(a => a.AppointmentDate)

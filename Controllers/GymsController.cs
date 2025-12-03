@@ -17,7 +17,6 @@ namespace FitnessCenter.Web.Controllers
             _context = context;
         }
 
-        // GET: Gyms
         public async Task<IActionResult> Index()
         {
             var gyms = await _context.Gyms
@@ -27,7 +26,6 @@ namespace FitnessCenter.Web.Controllers
             return View(gyms);
         }
 
-        // GET: Gyms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -47,13 +45,11 @@ namespace FitnessCenter.Web.Controllers
             return View(gym);
         }
 
-        // GET: Gyms/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Gyms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GymViewModel viewModel)
@@ -77,7 +73,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Gyms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -106,7 +101,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // POST: Gyms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, GymViewModel viewModel)
@@ -139,21 +133,18 @@ namespace FitnessCenter.Web.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GymExists(viewModel.Id))
+                    var gym = await _context.Gyms.FindAsync(id);
+                    if (gym == null)
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View(viewModel);
         }
 
-        // GET: Gyms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -171,7 +162,6 @@ namespace FitnessCenter.Web.Controllers
             return View(gym);
         }
 
-        // POST: Gyms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -186,10 +176,6 @@ namespace FitnessCenter.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool GymExists(int id)
-        {
-            return _context.Gyms.Any(e => e.Id == id);
-        }
     }
 }
 

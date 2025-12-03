@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessCenter.Web.Data;
@@ -8,6 +9,7 @@ namespace FitnessCenter.Web.Controllers.Api
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TrainersApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +21,6 @@ namespace FitnessCenter.Web.Controllers.Api
             _appointmentService = appointmentService;
         }
 
-        // GET: api/TrainersApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetTrainers()
         {
@@ -34,16 +35,20 @@ namespace FitnessCenter.Web.Controllers.Api
                     t.LastName,
                     t.FullName,
                     t.Specializations,
-                    t.AvailableHours,
+                    t.WorkDays,
+                    t.WorkStartTime,
+                    t.WorkEndTime,
                     GymName = t.Gym != null ? t.Gym.Name : null,
-                    Services = t.TrainerServices.Select(ts => new { ts.Service.Id, ts.Service.Name }).ToList()
+                    Services = t.TrainerServices
+                        .Where(ts => ts.Service != null)
+                        .Select(ts => new { ts.Service!.Id, ts.Service.Name })
+                        .ToList()
                 })
                 .ToListAsync();
 
             return Ok(trainers);
         }
 
-        // GET: api/TrainersApi/available?date=2024-01-01
         [HttpGet("available")]
         public async Task<ActionResult<IEnumerable<object>>> GetAvailableTrainers([FromQuery] DateTime? date)
         {
@@ -56,7 +61,7 @@ namespace FitnessCenter.Web.Controllers.Api
                 .Include(t => t.Gym)
                 .Include(t => t.TrainerServices)
                     .ThenInclude(ts => ts.Service)
-                .Where(t => t.AvailableHours != null && t.AvailableHours.Contains(date.Value.DayOfWeek.ToString()))
+                .Where(t => t.WorkDays != null && t.WorkDays.Contains(date.Value.DayOfWeek.ToString()))
                 .ToListAsync();
 
             var result = availableTrainers
@@ -67,16 +72,20 @@ namespace FitnessCenter.Web.Controllers.Api
                     t.LastName,
                     t.FullName,
                     t.Specializations,
-                    t.AvailableHours,
+                    t.WorkDays,
+                    t.WorkStartTime,
+                    t.WorkEndTime,
                     GymName = t.Gym != null ? t.Gym.Name : null,
-                    Services = t.TrainerServices.Select(ts => new { ts.Service.Id, ts.Service.Name }).ToList()
+                    Services = t.TrainerServices
+                        .Where(ts => ts.Service != null)
+                        .Select(ts => new { ts.Service!.Id, ts.Service.Name })
+                        .ToList()
                 })
                 .ToList();
 
             return Ok(result);
         }
 
-        // GET: api/TrainersApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetTrainer(int id)
         {
@@ -92,9 +101,14 @@ namespace FitnessCenter.Web.Controllers.Api
                     t.LastName,
                     t.FullName,
                     t.Specializations,
-                    t.AvailableHours,
+                    t.WorkDays,
+                    t.WorkStartTime,
+                    t.WorkEndTime,
                     GymName = t.Gym != null ? t.Gym.Name : null,
-                    Services = t.TrainerServices.Select(ts => new { ts.Service.Id, ts.Service.Name }).ToList()
+                    Services = t.TrainerServices
+                        .Where(ts => ts.Service != null)
+                        .Select(ts => new { ts.Service!.Id, ts.Service.Name })
+                        .ToList()
                 })
                 .FirstOrDefaultAsync();
 

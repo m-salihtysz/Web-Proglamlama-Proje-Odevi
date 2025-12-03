@@ -18,9 +18,6 @@ namespace FitnessCenter.Web.Models
         [StringLength(500)]
         public string? Specializations { get; set; }
 
-        [StringLength(200)]
-        public string? AvailableHours { get; set; }
-
         // Çalışma günleri (Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar)
         [StringLength(100)]
         public string? WorkDays { get; set; } // Örn: "Monday,Wednesday,Friday" veya "Pazartesi,Çarşamba,Cuma"

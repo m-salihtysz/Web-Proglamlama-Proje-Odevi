@@ -17,7 +17,6 @@ namespace FitnessCenter.Web.Controllers
             _context = context;
         }
 
-        // GET: Services
         public async Task<IActionResult> Index()
         {
             var services = await _context.Services
@@ -26,7 +25,6 @@ namespace FitnessCenter.Web.Controllers
             return View(services);
         }
 
-        // GET: Services/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,14 +43,12 @@ namespace FitnessCenter.Web.Controllers
             return View(service);
         }
 
-        // GET: Services/Create
         public async Task<IActionResult> Create()
         {
             ViewData["GymId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Gyms.ToListAsync(), "Id", "Name");
             return View();
         }
 
-        // POST: Services/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ServiceViewModel viewModel)
@@ -75,7 +71,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Services/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -103,7 +98,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // POST: Services/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ServiceViewModel viewModel)
@@ -134,14 +128,12 @@ namespace FitnessCenter.Web.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ServiceExists(viewModel.Id))
+                    var service = await _context.Services.FindAsync(id);
+                    if (service == null)
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -149,7 +141,6 @@ namespace FitnessCenter.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Services/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -168,7 +159,6 @@ namespace FitnessCenter.Web.Controllers
             return View(service);
         }
 
-        // POST: Services/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -183,10 +173,6 @@ namespace FitnessCenter.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ServiceExists(int id)
-        {
-            return _context.Services.Any(e => e.Id == id);
-        }
     }
 }
 

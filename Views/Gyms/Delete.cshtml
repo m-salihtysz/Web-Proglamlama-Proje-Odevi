@@ -44,17 +44,14 @@
         }
     </dd>
 
-    <dt class="col-sm-3">Hizmet Sayısı</dt>
-    <dd class="col-sm-9">@Model.Services.Count</dd>
-
     <dt class="col-sm-3">Antrenör Sayısı</dt>
     <dd class="col-sm-9">@Model.Trainers.Count</dd>
 </dl>
 
-@if (Model.Services.Any() || Model.Trainers.Any())
+@if (Model.Trainers.Any())
 {
     <div class="alert alert-warning">
-        <strong>Uyarı:</strong> Bu spor salonuna bağlı @Model.Services.Count hizmet ve @Model.Trainers.Count antrenör bulunmaktadır. 
+        <strong>Uyarı:</strong> Bu spor salonuna bağlı @Model.Trainers.Count antrenör bulunmaktadır. 
         Spor salonunu silerseniz, bu veriler de silinecektir.
     </div>
 }

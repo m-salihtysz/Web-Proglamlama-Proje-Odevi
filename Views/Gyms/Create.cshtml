@@ -3,70 +3,74 @@
     ViewData["Title"] = "Yeni Spor Salonu Ekle";
 }
 
-<h2>Yeni Spor Salonu Ekle</h2>
-<hr />
-
-<div class="row">
-    <div class="col-md-8">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-sm" style="border-radius: 20px; border: none;">
+            <div class="card-header bg-white" style="border-radius: 20px 20px 0 0 !important; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <h3 class="card-title mb-0 fw-semibold">Yeni Spor Salonu Ekle</h3>
             </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="Address" class="form-label"></label>
-                <textarea asp-for="Address" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Address" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-semibold">Spor Salonu Adı</label>
+                        <input asp-for="Name" class="form-control" style="border-radius: 10px;" placeholder="Örn: Power Gym, Fit Zone..." />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Çalışma Günleri</label>
-                <div class="row">
-                    @{
-                        var days = new[] { 
-                            ("Monday", "Pazartesi"), 
-                            ("Tuesday", "Salı"), 
-                            ("Wednesday", "Çarşamba"), 
-                            ("Thursday", "Perşembe"), 
-                            ("Friday", "Cuma"), 
-                            ("Saturday", "Cumartesi"), 
-                            ("Sunday", "Pazar") 
-                        };
-                    }
-                    @foreach (var (value, label) in days)
-                    {
-                        <div class="col-md-3 mb-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="WorkDays" value="@value" id="day_@value" />
-                                <label class="form-check-label" for="day_@value">@label</label>
-                            </div>
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label fw-semibold">Adres</label>
+                        <textarea asp-for="Address" class="form-control" rows="3" style="border-radius: 10px;" placeholder="Spor salonunun tam adresi..."></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Çalışma Günleri</label>
+                        <div class="row">
+                            @{
+                                var days = new[] { 
+                                    ("Monday", "Pazartesi"), 
+                                    ("Tuesday", "Salı"), 
+                                    ("Wednesday", "Çarşamba"), 
+                                    ("Thursday", "Perşembe"), 
+                                    ("Friday", "Cuma"), 
+                                    ("Saturday", "Cumartesi"), 
+                                    ("Sunday", "Pazar") 
+                                };
+                            }
+                            @foreach (var (value, label) in days)
+                            {
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="WorkDays" value="@value" id="day_@value" />
+                                        <label class="form-check-label" for="day_@value">@label</label>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                    }
-                </div>
-            </div>
+                    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="WorkStartTime" class="form-label"></label>
-                    <input asp-for="WorkStartTime" class="form-control" type="time" />
-                    <span asp-validation-for="WorkStartTime" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="WorkEndTime" class="form-label"></label>
-                    <input asp-for="WorkEndTime" class="form-control" type="time" />
-                    <span asp-validation-for="WorkEndTime" class="text-danger"></span>
-                </div>
-            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="WorkStartTime" class="form-label fw-semibold">Çalışma Başlangıç Saati</label>
+                            <input asp-for="WorkStartTime" class="form-control" type="time" style="border-radius: 10px;" />
+                            <span asp-validation-for="WorkStartTime" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="WorkEndTime" class="form-label fw-semibold">Çalışma Bitiş Saati</label>
+                            <input asp-for="WorkEndTime" class="form-control" type="time" style="border-radius: 10px;" />
+                            <span asp-validation-for="WorkEndTime" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Kaydet</button>
-                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2" style="border-radius: 12px; padding: 12px;">İptal</a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 12px; padding: 12px;">Kaydet</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 

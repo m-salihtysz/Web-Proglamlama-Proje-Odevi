@@ -20,7 +20,6 @@ namespace FitnessCenter.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var services = await _context.Services
-                .Include(s => s.Gym)
                 .ToListAsync();
             return View(services);
         }
@@ -33,7 +32,6 @@ namespace FitnessCenter.Web.Controllers
             }
 
             var service = await _context.Services
-                .Include(s => s.Gym)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (service == null)
             {
@@ -43,9 +41,8 @@ namespace FitnessCenter.Web.Controllers
             return View(service);
         }
 
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            ViewData["GymId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Gyms.ToListAsync(), "Id", "Name");
             return View();
         }
 
@@ -60,14 +57,12 @@ namespace FitnessCenter.Web.Controllers
                     Name = viewModel.Name,
                     Description = viewModel.Description,
                     DurationMinutes = viewModel.DurationMinutes,
-                    Price = viewModel.Price,
-                    GymId = viewModel.GymId
+                    Price = viewModel.Price
                 };
                 _context.Add(service);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GymId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Gyms.ToListAsync(), "Id", "Name", viewModel.GymId);
             return View(viewModel);
         }
 
@@ -90,11 +85,9 @@ namespace FitnessCenter.Web.Controllers
                 Name = service.Name,
                 Description = service.Description,
                 DurationMinutes = service.DurationMinutes,
-                Price = service.Price,
-                GymId = service.GymId
+                Price = service.Price
             };
 
-            ViewData["GymId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Gyms.ToListAsync(), "Id", "Name", service.GymId);
             return View(viewModel);
         }
 
@@ -121,7 +114,6 @@ namespace FitnessCenter.Web.Controllers
                     service.Description = viewModel.Description;
                     service.DurationMinutes = viewModel.DurationMinutes;
                     service.Price = viewModel.Price;
-                    service.GymId = viewModel.GymId;
 
                     _context.Update(service);
                     await _context.SaveChangesAsync();
@@ -137,7 +129,6 @@ namespace FitnessCenter.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GymId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _context.Gyms.ToListAsync(), "Id", "Name", viewModel.GymId);
             return View(viewModel);
         }
 
@@ -149,7 +140,6 @@ namespace FitnessCenter.Web.Controllers
             }
 
             var service = await _context.Services
-                .Include(s => s.Gym)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (service == null)
             {
@@ -166,6 +156,25 @@ namespace FitnessCenter.Web.Controllers
             var service = await _context.Services.FindAsync(id);
             if (service != null)
             {
+                // Önce bu hizmete bağlı randevuları sil
+                var appointments = await _context.Appointments
+                    .Where(a => a.ServiceId == id)
+                    .ToListAsync();
+                if (appointments.Any())
+                {
+                    _context.Appointments.RemoveRange(appointments);
+                }
+
+                // Sonra bu hizmete bağlı TrainerService ilişkilerini sil
+                var trainerServices = await _context.TrainerServices
+                    .Where(ts => ts.ServiceId == id)
+                    .ToListAsync();
+                if (trainerServices.Any())
+                {
+                    _context.TrainerServices.RemoveRange(trainerServices);
+                }
+
+                // En son hizmeti sil
                 _context.Services.Remove(service);
             }
 

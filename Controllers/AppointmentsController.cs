@@ -32,7 +32,12 @@ namespace FitnessCenter.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            var isAdmin = await _userManager.IsInRoleAsync(user!, "Admin");
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
 
             IQueryable<Appointment> appointmentsQuery = _context.Appointments
                 .Include(a => a.Gym)
@@ -42,7 +47,7 @@ namespace FitnessCenter.Web.Controllers
 
             if (!isAdmin)
             {
-                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == user!.Id);
+                appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == user.Id);
             }
 
             var appointments = await appointmentsQuery.ToListAsync();
@@ -74,9 +79,14 @@ namespace FitnessCenter.Web.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
-            var isAdmin = await _userManager.IsInRoleAsync(user!, "Admin");
+            if (user == null)
+            {
+                return Challenge();
+            }
 
-            if (!isAdmin && appointment.MemberId != user!.Id)
+            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+            if (!isAdmin && appointment.MemberId != user.Id)
             {
                 return Forbid();
             }
@@ -101,6 +111,11 @@ namespace FitnessCenter.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return Challenge();
+                }
+
                 var service = await _context.Services.FindAsync(viewModel.ServiceId);
                 
                 if (service == null)
@@ -125,7 +140,7 @@ namespace FitnessCenter.Web.Controllers
 
                 var appointment = new Appointment
                 {
-                    MemberId = user!.Id,
+                    MemberId = user.Id,
                     GymId = viewModel.GymId,
                     TrainerId = viewModel.TrainerId,
                     ServiceId = viewModel.ServiceId,
@@ -244,9 +259,14 @@ namespace FitnessCenter.Web.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
-            var isAdmin = await _userManager.IsInRoleAsync(user!, "Admin");
+            if (user == null)
+            {
+                return Challenge();
+            }
 
-            if (!isAdmin && appointment.MemberId != user!.Id)
+            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+            if (!isAdmin && appointment.MemberId != user.Id)
             {
                 return Forbid();
             }
@@ -262,9 +282,14 @@ namespace FitnessCenter.Web.Controllers
             if (appointment != null)
             {
                 var user = await _userManager.GetUserAsync(User);
-                var isAdmin = await _userManager.IsInRoleAsync(user!, "Admin");
+                if (user == null)
+                {
+                    return Challenge();
+                }
 
-                if (!isAdmin && appointment.MemberId != user!.Id)
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+                if (!isAdmin && appointment.MemberId != user.Id)
                 {
                     return Forbid();
                 }

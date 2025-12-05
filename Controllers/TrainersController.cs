@@ -231,6 +231,25 @@ namespace FitnessCenter.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // İlgili randevuları sil (randevular fiilen iptal edilmiş olur)
+            var relatedAppointments = await _context.Appointments
+                .Where(a => a.TrainerId == id)
+                .ToListAsync();
+            if (relatedAppointments.Any())
+            {
+                _context.Appointments.RemoveRange(relatedAppointments);
+            }
+
+            // Eğitmene bağlı hizmet ilişkilerini sil
+            var relatedTrainerServices = await _context.TrainerServices
+                .Where(ts => ts.TrainerId == id)
+                .ToListAsync();
+            if (relatedTrainerServices.Any())
+            {
+                _context.TrainerServices.RemoveRange(relatedTrainerServices);
+            }
+
+            // Eğitmeni sil
             var trainer = await _context.Trainers.FindAsync(id);
             if (trainer != null)
             {

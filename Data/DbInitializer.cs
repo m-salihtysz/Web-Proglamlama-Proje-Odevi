@@ -112,6 +112,7 @@ namespace FitnessCenter.Web.Data
                     logger.LogInformation("Admin user already exists with correct role: {Email}", adminEmail);
                 }
             }
+
         }
     }
 }

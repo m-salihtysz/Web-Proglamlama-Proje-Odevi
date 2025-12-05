@@ -3,57 +3,61 @@
     ViewData["Title"] = "Randevu Al";
 }
 
-<h2>Yeni Randevu Al</h2>
-<hr />
-
-<div class="row">
-    <div class="col-md-8">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="GymId" class="form-label"></label>
-                <select asp-for="GymId" asp-items="ViewBag.GymId" class="form-select" id="gymSelect">
-                    <option value="">-- Spor Salonu Seçin --</option>
-                </select>
-                <span asp-validation-for="GymId" class="text-danger"></span>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm" style="border-radius: 16px;">
+            <div class="card-header bg-white" style="border-radius: 16px 16px 0 0 !important; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <h3 class="card-title mb-0">Yeni Randevu Al</h3>
             </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="TrainerId" class="form-label"></label>
-                <select asp-for="TrainerId" asp-items="ViewBag.TrainerId" class="form-select" id="trainerSelect" disabled>
-                    <option value="">-- Antrenör Seçin --</option>
-                </select>
-                <span asp-validation-for="TrainerId" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="GymId" class="form-label"></label>
+                        <select asp-for="GymId" asp-items="ViewBag.GymId" class="form-select" id="gymSelect">
+                            <option value="">-- Spor Salonu Seçin --</option>
+                        </select>
+                        <span asp-validation-for="GymId" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="ServiceId" class="form-label"></label>
-                <select asp-for="ServiceId" asp-items="ViewBag.ServiceId" class="form-select" id="serviceSelect" disabled>
-                    <option value="">-- Hizmet Seçin --</option>
-                </select>
-                <span asp-validation-for="ServiceId" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="TrainerId" class="form-label"></label>
+                        <select asp-for="TrainerId" asp-items="ViewBag.TrainerId" class="form-select" id="trainerSelect" disabled>
+                            <option value="">-- Antrenör Seçin --</option>
+                        </select>
+                        <span asp-validation-for="TrainerId" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="AppointmentDate" class="form-label"></label>
-                <input asp-for="AppointmentDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" id="appointmentDate" />
-                <span asp-validation-for="AppointmentDate" class="text-danger"></span>
-                <small class="form-text text-muted">Tarih seçildiğinde o gün çalışan antrenörler gösterilecektir.</small>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="ServiceId" class="form-label"></label>
+                        <select asp-for="ServiceId" asp-items="ViewBag.ServiceId" class="form-select" id="serviceSelect" disabled>
+                            <option value="">-- Hizmet Seçin --</option>
+                        </select>
+                        <span asp-validation-for="ServiceId" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="AppointmentTime" class="form-label"></label>
-                <input asp-for="AppointmentTime" class="form-control" type="time" id="appointmentTime" />
-                <span asp-validation-for="AppointmentTime" class="text-danger"></span>
-                <small class="form-text text-muted" id="workHoursInfo">Antrenör seçildiğinde çalışma saatleri gösterilecektir.</small>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="AppointmentDate" class="form-label"></label>
+                        <input asp-for="AppointmentDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" id="appointmentDate" />
+                        <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                        <small class="form-text text-muted">Tarih seçildiğinde o gün çalışan antrenörler gösterilecektir.</small>
+                    </div>
 
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Randevu Al</button>
-                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <div class="mb-3">
+                        <label asp-for="AppointmentTime" class="form-label"></label>
+                        <input asp-for="AppointmentTime" class="form-control" type="time" id="appointmentTime" />
+                        <span asp-validation-for="AppointmentTime" class="text-danger"></span>
+                        <small class="form-text text-muted" id="workHoursInfo">Antrenör seçildiğinde çalışma saatleri gösterilecektir.</small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">İptal</a>
+                        <button type="submit" class="btn btn-primary">Randevu Al</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 

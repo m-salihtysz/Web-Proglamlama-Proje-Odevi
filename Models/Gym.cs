@@ -22,7 +22,6 @@ namespace FitnessCenter.Web.Models
         public TimeSpan? WorkStartTime { get; set; } // Örn: 06:00
         public TimeSpan? WorkEndTime { get; set; } // Örn: 22:00
 
-        public ICollection<Service> Services { get; set; } = new List<Service>();
         public ICollection<Trainer> Trainers { get; set; } = new List<Trainer>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }

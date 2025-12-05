@@ -9,7 +9,7 @@
     @if (isAdmin)
     {
         <div class="text-center mb-4 app-dashboard-header">
-            <h1 class="display-4">👨‍💼 Admin Paneli</h1>
+            <h1 class="display-4">Admin Paneli</h1>
             <p class="lead">Spor salonu yönetim sistemini yönetin</p>
         </div>
 
@@ -19,10 +19,10 @@
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">🏋️ Spor Salonları</h2>
                         <p class="card-text">Spor salonlarını ekleyin, düzenleyin ve yönetin.</p>
-                        <a asp-controller="Gyms" asp-action="Index" class="btn btn-primary btn-lg w-100">
+                        <a asp-controller="Gyms" asp-action="Index" class="btn btn-lg w-100 btn-manage">
                             <i class="bi bi-building"></i> Spor Salonlarını Yönet
                         </a>
-                        <a asp-controller="Gyms" asp-action="Create" class="btn btn-outline-primary mt-2 w-100">
+                        <a asp-controller="Gyms" asp-action="Create" class="btn btn-outline-fume mt-2 w-100">
                             ➕ Yeni Spor Salonu Ekle
                         </a>
                     </div>
@@ -49,10 +49,10 @@
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">💼 Hizmetler</h2>
                         <p class="card-text">Hizmetleri ekleyin, düzenleyin ve yönetin.</p>
-                        <a asp-controller="Services" asp-action="Index" class="btn btn-info btn-lg w-100">
+                        <a asp-controller="Services" asp-action="Index" class="btn btn-info btn-lg w-100 btn-manage">
                             <i class="bi bi-list-check"></i> Hizmetleri Yönet
                         </a>
-                        <a asp-controller="Services" asp-action="Create" class="btn btn-outline-info mt-2 w-100">
+                        <a asp-controller="Services" asp-action="Create" class="btn btn-outline-fume mt-2 w-100">
                             ➕ Yeni Hizmet Ekle
                         </a>
                     </div>
@@ -75,7 +75,7 @@
     else if (isMember)
     {
         <div class="text-center mb-4 app-dashboard-header">
-            <h1 class="display-4">👤 Üye Paneli</h1>
+            <h1 class="display-4">Üye Paneli</h1>
             <p class="lead">Randevularınızı yönetin ve kişiselleştirilmiş öneriler alın</p>
         </div>
 
@@ -85,7 +85,7 @@
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">📅 Randevu Al</h2>
                         <p class="card-text">Uygun antrenör ve hizmete göre yeni randevu oluşturun.</p>
-                        <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg w-100">
+                        <a asp-controller="Appointments" asp-action="Create" class="btn btn-success btn-lg w-100">
                             <i class="bi bi-calendar-plus"></i> Yeni Randevu Al
                         </a>
                     </div>
@@ -109,7 +109,7 @@
                     <div class="card-body text-center">
                         <h2 class="card-title mb-3">🤖 Yapay Zeka Önerileri</h2>
                         <p class="card-text">Vücut ölçülerinizi girerek kişiselleştirilmiş egzersiz ve diyet planı alın.</p>
-                        <a asp-controller="AIRecommendation" asp-action="Index" class="btn btn-info btn-lg">
+                        <a asp-controller="AIRecommendation" asp-action="Index" class="btn btn-primary btn-lg">
                             <i class="bi bi-robot"></i> Önerileri Al
                         </a>
                     </div>
@@ -120,20 +120,22 @@
 }
 else
 {
-    <div class="text-center">
-        <h1 class="display-4">Spor Salonu Yönetim Sistemine Hoş Geldiniz</h1>
-        <p class="lead">Spor salonunuzu, antrenörleri, hizmetleri ve randevuları tek bir yerden yönetin.</p>
+    <div class="text-center py-5">
+        <div class="mb-5">
+            <h1 class="display-3 fw-bold mb-4" style="color: #1a202c; letter-spacing: -0.02em;">Spor Salonu Yönetim Sistemine<br />Hoş Geldiniz</h1>
+            <p class="lead fs-4" style="color: #4a5568; max-width: 700px; margin: 0 auto;">Spor salonunuzu, antrenörleri, hizmetleri ve randevuları<br />tek bir yerden yönetin.</p>
+        </div>
         
         <div class="mt-5">
             <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3>Başlamak için</h3>
-                            <p>Lütfen giriş yapın veya yeni hesap oluşturun.</p>
-                            <div class="d-grid gap-2">
-                                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg">Giriş Yap</a>
-                                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg">Kayıt Ol</a>
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-sm" style="border-radius: 20px; border: none;">
+                        <div class="card-body p-4">
+                            <h3 class="fw-semibold mb-3" style="color: #374151;">Başlamak için</h3>
+                            <p class="mb-4" style="color: #6b7280;">Lütfen giriş yapın veya yeni hesap oluşturun.</p>
+                            <div class="d-grid gap-3">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg" style="border-radius: 12px; padding: 12px;">Giriş Yap</a>
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg" style="border-radius: 12px; padding: 12px;">Kayıt Ol</a>
                             </div>
                         </div>
                     </div>

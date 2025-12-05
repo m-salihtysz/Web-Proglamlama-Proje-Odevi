@@ -24,10 +24,6 @@ namespace FitnessCenter.Web.ViewModels
         [Range(0.01, 10000, ErrorMessage = "Fiyat 0.01 ile 10000 arasında olmalıdır")]
         [Display(Name = "Fiyat (TL)")]
         public decimal Price { get; set; }
-
-        [Required(ErrorMessage = "Spor salonu gereklidir")]
-        [Display(Name = "Spor Salonu")]
-        public int GymId { get; set; }
     }
 }
 

@@ -18,8 +18,8 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
-  background: radial-gradient(circle at top left, #f5f9ff 0, #ffffff 55%, #f9fafb 100%);
+  margin-bottom: 0;
+  background: radial-gradient(circle at top left, #d1d5db 0, #e5e7eb 55%, #f3f4f6 100%);
 }
 
 /* Üst navbar için modern stil */
@@ -175,4 +175,157 @@ body {
 .btn-success,
 .btn-info {
   border-radius: 999px;
+}
+
+.btn-success,
+.btn-info {
+  border-radius: 999px;
+}
+
+/* Footer her zaman en altta */
+.app-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  color: #6c757d;
+  margin-top: auto;
+}
+
+/* Gri tonlar için metin stilleri */
+h1, h2, h3, h4, h5, h6 {
+  color: #2d3748;
+}
+
+.display-4 {
+  color: #1a202c;
+}
+
+.lead {
+  color: #4a5568;
+}
+
+p {
+  color: #4b5563;
+}
+
+.card-text {
+  color: #6b7280;
+}
+
+.card-title {
+  color: #374151;
+}
+
+.navbar-text {
+  color: #4a5568;
+}
+
+.text-gray-dark {
+  color: #374151;
+}
+
+.text-gray {
+  color: #6b7280;
+}
+
+/* Yönet butonları için füme renk */
+.btn-manage {
+  background-color: #4a5568 !important;
+  border-color: #4a5568 !important;
+  color: #fff !important;
+}
+
+.btn-manage:hover {
+  background-color: #374151 !important;
+  border-color: #374151 !important;
+  color: #fff !important;
+}
+
+/* Füme outline buton */
+.btn-outline-fume {
+  color: #4a5568;
+  border-color: #4a5568;
+  background-color: transparent;
+  border-radius: 999px;
+}
+
+.btn-outline-fume:hover {
+  color: #fff;
+  background-color: #4a5568;
+  border-color: #4a5568;
+}
+
+/* Tablo hücrelerinin köşelerini oval yap */
+.table-responsive {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+}
+
+.table th,
+.table td {
+  border-radius: 0;
+  padding: 0.75rem;
+}
+
+.table thead th:first-child {
+  border-top-left-radius: 16px;
+}
+
+.table thead th:last-child {
+  border-top-right-radius: 16px;
+}
+
+.table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 16px;
+}
+
+.table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 16px;
+}
+
+/* Açık mavi renkleri açık kahve yap */
+.btn-info {
+  color: #fff;
+  background-color: #a0826d;
+  border-color: #a0826d;
+}
+
+.btn-info:hover {
+  color: #fff;
+  background-color: #8b6f5a;
+  border-color: #8b6f5a;
+}
+
+.btn-outline-info {
+  color: #a0826d;
+  border-color: #a0826d;
+}
+
+.btn-outline-info:hover {
+  color: #fff;
+  background-color: #a0826d;
+  border-color: #a0826d;
+}
+
+.alert-info {
+  background-color: #e8ddd4;
+  border-color: #a0826d;
+  color: #5d4a3a;
+}
+
+.bg-info {
+  background-color: #a0826d !important;
+}
+
+.border-info {
+  border-color: #a0826d !important;
+}
+
+.text-info {
+  color: #a0826d !important;
 }

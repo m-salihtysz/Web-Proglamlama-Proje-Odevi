@@ -20,7 +20,6 @@ namespace FitnessCenter.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var gyms = await _context.Gyms
-                .Include(g => g.Services)
                 .Include(g => g.Trainers)
                 .ToListAsync();
             return View(gyms);
@@ -34,7 +33,6 @@ namespace FitnessCenter.Web.Controllers
             }
 
             var gym = await _context.Gyms
-                .Include(g => g.Services)
                 .Include(g => g.Trainers)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (gym == null)
@@ -169,6 +167,47 @@ namespace FitnessCenter.Web.Controllers
             var gym = await _context.Gyms.FindAsync(id);
             if (gym != null)
             {
+                // Önce bu spor salonuna bağlı randevuları sil
+                var appointments = await _context.Appointments
+                    .Where(a => a.GymId == id)
+                    .ToListAsync();
+                if (appointments.Any())
+                {
+                    _context.Appointments.RemoveRange(appointments);
+                }
+
+                // Bu spor salonuna bağlı antrenörleri al
+                var trainers = await _context.Trainers
+                    .Where(t => t.GymId == id)
+                    .ToListAsync();
+
+                // Her antrenör için randevuları ve TrainerService ilişkilerini sil
+                foreach (var trainer in trainers)
+                {
+                    var trainerAppointments = await _context.Appointments
+                        .Where(a => a.TrainerId == trainer.Id)
+                        .ToListAsync();
+                    if (trainerAppointments.Any())
+                    {
+                        _context.Appointments.RemoveRange(trainerAppointments);
+                    }
+
+                    var trainerServices = await _context.TrainerServices
+                        .Where(ts => ts.TrainerId == trainer.Id)
+                        .ToListAsync();
+                    if (trainerServices.Any())
+                    {
+                        _context.TrainerServices.RemoveRange(trainerServices);
+                    }
+                }
+
+                // Antrenörleri sil
+                if (trainers.Any())
+                {
+                    _context.Trainers.RemoveRange(trainers);
+                }
+
+                // En son spor salonunu sil
                 _context.Gyms.Remove(gym);
             }
 

@@ -19,14 +19,6 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="GymId" class="form-label"></label>
-                <select asp-for="GymId" asp-items="ViewBag.GymId" class="form-select">
-                    <option value="">-- Spor Salonu Seçin --</option>
-                </select>
-                <span asp-validation-for="GymId" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
                 <label asp-for="Description" class="form-label"></label>
                 <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>

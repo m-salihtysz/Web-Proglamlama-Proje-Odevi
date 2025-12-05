@@ -21,10 +21,6 @@ namespace FitnessCenter.Web.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
-        [Required]
-        public int GymId { get; set; }
-        public Gym? Gym { get; set; }
-
         public ICollection<TrainerService> TrainerServices { get; set; } = new List<TrainerService>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }

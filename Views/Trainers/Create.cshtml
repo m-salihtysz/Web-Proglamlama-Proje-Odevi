@@ -4,105 +4,136 @@
     var services = ViewBag.Services as List<FitnessCenter.Web.Models.Service> ?? new List<FitnessCenter.Web.Models.Service>();
 }
 
-<h2>Yeni Antrenör Ekle</h2>
-<hr />
-
-<div class="row">
-    <div class="col-md-8">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="FirstName" class="form-label"></label>
-                    <input asp-for="FirstName" class="form-control" />
-                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="LastName" class="form-label"></label>
-                    <input asp-for="LastName" class="form-control" />
-                    <span asp-validation-for="LastName" class="text-danger"></span>
-                </div>
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-sm" style="border-radius: 20px; border: none;">
+            <div class="card-header bg-white" style="border-radius: 20px 20px 0 0 !important; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <h3 class="card-title mb-0 fw-semibold">Yeni Antrenör Ekle</h3>
             </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="GymId" class="form-label"></label>
-                <select asp-for="GymId" asp-items="ViewBag.GymId" class="form-select">
-                    <option value="">-- Spor Salonu Seçin --</option>
-                </select>
-                <span asp-validation-for="GymId" class="text-danger"></span>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label fw-semibold">Ad</label>
+                            <input asp-for="FirstName" class="form-control" style="border-radius: 10px;" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
 
-            <div class="mb-3">
-                <label asp-for="Specializations" class="form-label"></label>
-                <textarea asp-for="Specializations" class="form-control" rows="3" placeholder="Örn: Kas geliştirme, kilo verme, yoga, pilates..."></textarea>
-                <span asp-validation-for="Specializations" class="text-danger"></span>
-            </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label fw-semibold">Soyad</label>
+                            <input asp-for="LastName" class="form-control" style="border-radius: 10px;" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Çalışma Günleri</label>
-                <div class="row">
-                    @{
-                        var days = new[] { 
-                            ("Monday", "Pazartesi"), 
-                            ("Tuesday", "Salı"), 
-                            ("Wednesday", "Çarşamba"), 
-                            ("Thursday", "Perşembe"), 
-                            ("Friday", "Cuma"), 
-                            ("Saturday", "Cumartesi"), 
-                            ("Sunday", "Pazar") 
-                        };
-                    }
-                    @foreach (var (value, label) in days)
-                    {
-                        <div class="col-md-3 mb-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="WorkDays" value="@value" id="day_@value" />
-                                <label class="form-check-label" for="day_@value">@label</label>
+                    <div class="mb-3">
+                        <label asp-for="GymId" class="form-label fw-semibold">Spor Salonu</label>
+                        <select asp-for="GymId" asp-items="ViewBag.GymId" class="form-select" style="border-radius: 10px;">
+                            <option value="">-- Spor Salonu Seçin --</option>
+                        </select>
+                        <span asp-validation-for="GymId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Specializations" class="form-label fw-semibold">Uzmanlık Alanları</label>
+                        <textarea asp-for="Specializations" class="form-control" rows="3" style="border-radius: 10px;" placeholder="Örn: Kas geliştirme, kilo verme, yoga, pilates..."></textarea>
+                        <span asp-validation-for="Specializations" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Çalışma Günleri</label>
+                        <div class="row">
+                            @{
+                                var days = new[] { 
+                                    ("Monday", "Pazartesi"), 
+                                    ("Tuesday", "Salı"), 
+                                    ("Wednesday", "Çarşamba"), 
+                                    ("Thursday", "Perşembe"), 
+                                    ("Friday", "Cuma"), 
+                                    ("Saturday", "Cumartesi"), 
+                                    ("Sunday", "Pazar") 
+                                };
+                            }
+                            @foreach (var (value, label) in days)
+                            {
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="WorkDays" value="@value" id="day_@value" />
+                                        <label class="form-check-label" for="day_@value">@label</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="WorkStartTime" class="form-label fw-semibold">Çalışma Başlangıç Saati</label>
+                            <input asp-for="WorkStartTime" class="form-control" type="time" style="border-radius: 10px;" />
+                            <span asp-validation-for="WorkStartTime" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="WorkEndTime" class="form-label fw-semibold">Çalışma Bitiş Saati</label>
+                            <input asp-for="WorkEndTime" class="form-control" type="time" style="border-radius: 10px;" />
+                            <span asp-validation-for="WorkEndTime" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold mb-3">Hizmetler</label>
+                        @if (services.Any())
+                        {
+                            <div class="table-responsive" style="border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+                                <table class="table table-hover mb-0">
+                                    <thead style="background-color: #f8f9fa;">
+                                        <tr>
+                                            <th style="width: 50px; text-align: center;">Seç</th>
+                                            <th>Hizmet Adı</th>
+                                            <th>Süre</th>
+                                            <th>Fiyat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var service in services)
+                                        {
+                                            <tr>
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    <input class="form-check-input" type="checkbox" name="ServiceIds" value="@service.Id" id="service_@service.Id" />
+                                                </td>
+                                                <td style="vertical-align: middle;">
+                                                    <label class="form-check-label mb-0" for="service_@service.Id" style="cursor: pointer;">
+                                                        <strong>@service.Name</strong>
+                                                        @if (!string.IsNullOrEmpty(service.Description))
+                                                        {
+                                                            <br /><small class="text-muted">@(service.Description.Length > 50 ? service.Description.Substring(0, 50) + "..." : service.Description)</small>
+                                                        }
+                                                    </label>
+                                                </td>
+                                                <td style="vertical-align: middle;">@service.DurationMinutes dakika</td>
+                                                <td style="vertical-align: middle;"><strong>@service.Price.ToString("C")</strong></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                    }
-                </div>
-            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info" style="border-radius: 12px;">
+                                <small>Önce hizmet eklemeniz gerekiyor.</small>
+                            </div>
+                        }
+                    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="WorkStartTime" class="form-label"></label>
-                    <input asp-for="WorkStartTime" class="form-control" type="time" />
-                    <span asp-validation-for="WorkStartTime" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="WorkEndTime" class="form-label"></label>
-                    <input asp-for="WorkEndTime" class="form-control" type="time" />
-                    <span asp-validation-for="WorkEndTime" class="text-danger"></span>
-                </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2" style="border-radius: 12px; padding: 12px;">İptal</a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 12px; padding: 12px;">Kaydet</button>
+                    </div>
+                </form>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="ServiceIds" class="form-label"></label>
-                <div class="border p-3" style="max-height: 200px; overflow-y: auto;">
-                    @foreach (var service in services)
-                    {
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="ServiceIds" value="@service.Id" id="service_@service.Id" />
-                            <label class="form-check-label" for="service_@service.Id">
-                                @service.Name - @service.Price.ToString("C") (@service.DurationMinutes dakika)
-                            </label>
-                        </div>
-                    }
-                </div>
-                @if (!services.Any())
-                {
-                    <small class="text-muted">Önce hizmet eklemeniz gerekiyor.</small>
-                }
-            </div>
-
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Kaydet</button>
-                <a asp-action="Index" class="btn btn-secondary">İptal</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

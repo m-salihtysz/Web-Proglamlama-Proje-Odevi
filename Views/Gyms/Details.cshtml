@@ -43,25 +43,9 @@
         }
     </dd>
 
-    <dt class="col-sm-3">Hizmet Sayısı</dt>
-    <dd class="col-sm-9">@Model.Services.Count</dd>
-
     <dt class="col-sm-3">Antrenör Sayısı</dt>
     <dd class="col-sm-9">@Model.Trainers.Count</dd>
 </dl>
-
-@if (Model.Services.Any())
-{
-    <h4 class="mt-4">Hizmetler</h4>
-    <ul class="list-group">
-        @foreach (var service in Model.Services)
-        {
-            <li class="list-group-item">
-                <strong>@service.Name</strong> - @service.Price.ToString("C") (@service.DurationMinutes dakika)
-            </li>
-        }
-    </ul>
-}
 
 @if (Model.Trainers.Any())
 {

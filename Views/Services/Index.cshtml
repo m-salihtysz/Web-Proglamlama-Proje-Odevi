@@ -15,7 +15,6 @@
             <thead>
                 <tr>
                     <th>Hizmet Adı</th>
-                    <th>Spor Salonu</th>
                     <th>Açıklama</th>
                     <th>Süre</th>
                     <th>Fiyat</th>
@@ -27,7 +26,6 @@
                 {
                     <tr>
                         <td><strong>@service.Name</strong></td>
-                        <td>@(service.Gym?.Name ?? "Yok")</td>
                         <td>@(service.Description?.Length > 50 ? service.Description.Substring(0, 50) + "..." : service.Description ?? "Açıklama yok")</td>
                         <td>@service.DurationMinutes dakika</td>
                         <td>@service.Price.ToString("C")</td>

@@ -181,17 +181,9 @@ namespace FitnessCenter.Web.Controllers
                     .Where(t => t.GymId == id)
                     .ToListAsync();
 
-                // Her antrenör için randevuları ve TrainerService ilişkilerini sil
+                // Her antrenör için TrainerService ilişkilerini sil
                 foreach (var trainer in trainers)
                 {
-                    var trainerAppointments = await _context.Appointments
-                        .Where(a => a.TrainerId == trainer.Id)
-                        .ToListAsync();
-                    if (trainerAppointments.Any())
-                    {
-                        _context.Appointments.RemoveRange(trainerAppointments);
-                    }
-
                     var trainerServices = await _context.TrainerServices
                         .Where(ts => ts.TrainerId == trainer.Id)
                         .ToListAsync();
@@ -214,7 +206,6 @@ namespace FitnessCenter.Web.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
     }
 }
 

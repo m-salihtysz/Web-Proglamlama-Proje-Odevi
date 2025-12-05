@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessCenter.Web.Data;
 using FitnessCenter.Web.Models;
-using FitnessCenter.Web.Services;
 
 namespace FitnessCenter.Web.Controllers.Api
 {
@@ -13,12 +12,10 @@ namespace FitnessCenter.Web.Controllers.Api
     public class TrainersApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly AppointmentService _appointmentService;
 
-        public TrainersApiController(ApplicationDbContext context, AppointmentService appointmentService)
+        public TrainersApiController(ApplicationDbContext context)
         {
             _context = context;
-            _appointmentService = appointmentService;
         }
 
         [HttpGet]

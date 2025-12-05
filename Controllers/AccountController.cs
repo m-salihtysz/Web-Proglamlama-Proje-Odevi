@@ -32,7 +32,6 @@ namespace FitnessCenter.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
-
             if (ModelState.IsValid)
             {
                 // Find user by email
@@ -55,10 +54,8 @@ namespace FitnessCenter.Web.Controllers
                     _logger.LogInformation("User logged in: {Email}", model.Email);
                     return RedirectToLocal(returnUrl);
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. E-posta veya şifre hatalı olabilir.");
-                }
+
+                ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. E-posta veya şifre hatalı olabilir.");
                 return View(model);
             }
 
@@ -75,7 +72,6 @@ namespace FitnessCenter.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
         {
-
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser

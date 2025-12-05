@@ -76,7 +76,6 @@ namespace FitnessCenter.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAppointments()
         {
-            // Get current user
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
@@ -96,7 +95,6 @@ namespace FitnessCenter.Web.Controllers.Api
                 appointmentsQuery = appointmentsQuery.Where(a => a.MemberId == currentUser.Id);
             }
 
-            // SQLite doesn't support TimeSpan in ORDER BY, so we fetch first then sort in memory
             var appointments = await appointmentsQuery.ToListAsync();
 
             var result = appointments

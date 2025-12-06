@@ -2,7 +2,6 @@ using FitnessCenter.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 
 namespace FitnessCenter.Web.Data
 {

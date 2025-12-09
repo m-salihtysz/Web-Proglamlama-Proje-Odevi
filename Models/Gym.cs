@@ -14,13 +14,11 @@ namespace FitnessCenter.Web.Models
         [StringLength(500)]
         public string Address { get; set; } = string.Empty;
 
-        // Çalışma günleri (Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar)
         [StringLength(100)]
-        public string? WorkDays { get; set; } // Örn: "Monday,Wednesday,Friday" veya "Pazartesi,Çarşamba,Cuma"
+        public string? WorkDays { get; set; }
 
-        // Çalışma saatleri
-        public TimeSpan? WorkStartTime { get; set; } // Örn: 06:00
-        public TimeSpan? WorkEndTime { get; set; } // Örn: 22:00
+        public TimeSpan? WorkStartTime { get; set; }
+        public TimeSpan? WorkEndTime { get; set; }
 
         public ICollection<Trainer> Trainers { get; set; } = new List<Trainer>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();

@@ -37,7 +37,7 @@ namespace FitnessCenter.Web.Controllers
                     return View(viewModel);
                 }
 
-                var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsAsync(
+                    var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsAsync(
                         viewModel.Height, 
                         viewModel.Weight, 
                         viewModel.BodyType, 

@@ -6,17 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlite(connectionString);
-    
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
     
-    // Configure connection lifetime
     if (builder.Environment.IsDevelopment())
     {
         options.EnableDetailedErrors();
@@ -42,17 +39,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddControllersWithViews();
-
-// Add HttpClient for AI service
 builder.Services.AddHttpClient();
-
-// Register custom services
 builder.Services.AddScoped<AIService>();
 builder.Services.AddScoped<AppointmentService>();
 
 var app = builder.Build();
 
-// Initialize database and seed data with timeout
 try
 {
     using var initCts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
@@ -78,7 +70,6 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred while seeding the database. Application will continue to start.");
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

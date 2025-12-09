@@ -18,13 +18,11 @@ namespace FitnessCenter.Web.Models
         [StringLength(500)]
         public string? Specializations { get; set; }
 
-        // Çalışma günleri (Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar)
         [StringLength(100)]
-        public string? WorkDays { get; set; } // Örn: "Monday,Wednesday,Friday" veya "Pazartesi,Çarşamba,Cuma"
+        public string? WorkDays { get; set; }
 
-        // Çalışma saatleri
-        public TimeSpan? WorkStartTime { get; set; } // Örn: 09:00
-        public TimeSpan? WorkEndTime { get; set; } // Örn: 18:00
+        public TimeSpan? WorkStartTime { get; set; }
+        public TimeSpan? WorkEndTime { get; set; }
 
         [Required]
         public int GymId { get; set; }

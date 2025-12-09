@@ -55,7 +55,7 @@ namespace FitnessCenter.Web.Controllers
                     return RedirectToLocal(returnUrl);
                 }
 
-                ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. E-posta veya şifre hatalı olabilir.");
+                    ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. E-posta veya şifre hatalı olabilir.");
                 return View(model);
             }
 

@@ -312,8 +312,7 @@ namespace FitnessCenter.Web.Controllers
                     .ToListAsync();
 
                 if (!string.IsNullOrEmpty(appointmentDate) && 
-                    (DateTime.TryParse(appointmentDate, out var date) || 
-                     DateTime.TryParseExact(appointmentDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out date)))
+                    DateTime.TryParseExact(appointmentDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var date))
                 {
                     var dayOfWeek = date.DayOfWeek.ToString();
                     allTrainers = allTrainers

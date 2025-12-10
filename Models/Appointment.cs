@@ -50,4 +50,3 @@ namespace FitnessCenter.Web.Models
         Cancelled
     }
 }
-

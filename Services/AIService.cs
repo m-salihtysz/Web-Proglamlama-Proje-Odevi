@@ -91,8 +91,16 @@ namespace FitnessCenter.Web.Services
                             
                             if (listDoc.RootElement.TryGetProperty("models", out var modelsArray))
                             {
-                                // Prefer free tier models (gemini-1.5-flash, gemini-1.5-pro)
-                                var preferredModels = new[] { "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro" };
+                                // Prefer highest quota models first (flash-live > flash-lite > flash > pro)
+                                var preferredModels = new[]
+                                {
+                                    "gemini-2.5-flash-live",
+                                    "gemini-2.0-flash-live",
+                                    "gemini-2.5-flash-lite",
+                                    "gemini-1.5-flash",
+                                    "gemini-1.5-pro",
+                                    "gemini-pro"
+                                };
                                 
                                 foreach (var preferredModel in preferredModels)
                                 {
@@ -150,12 +158,18 @@ namespace FitnessCenter.Web.Services
                 {
                     var commonModels = new[]
                     {
-                        ("v1beta", "gemini-1.5-flash"),
+                        ("v1", "gemini-2.5-flash-live"),
+                        ("v1beta", "gemini-2.5-flash-live"),
+                        ("v1", "gemini-2.0-flash-live"),
+                        ("v1beta", "gemini-2.0-flash-live"),
+                        ("v1", "gemini-2.5-flash-lite"),
+                        ("v1beta", "gemini-2.5-flash-lite"),
                         ("v1", "gemini-1.5-flash"),
-                        ("v1beta", "gemini-1.5-pro"),
+                        ("v1beta", "gemini-1.5-flash"),
                         ("v1", "gemini-1.5-pro"),
-                        ("v1beta", "gemini-pro"),
-                        ("v1", "gemini-pro")
+                        ("v1beta", "gemini-1.5-pro"),
+                        ("v1", "gemini-pro"),
+                        ("v1beta", "gemini-pro")
                     };
                     
                     foreach (var (version, model) in commonModels)

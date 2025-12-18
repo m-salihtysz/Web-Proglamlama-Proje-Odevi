@@ -5,7 +5,7 @@
 
 <div class="container">
     <h2 class="mb-4">🤖 Yapay Zeka Önerileri</h2>
-    <p class="lead">Vücut ölçülerinizi girerek kişiselleştirilmiş egzersiz ve diyet planı alın.</p>
+    <p class="lead">Bilgilerinizi girerek veya fotoğraf yükleyerek kişiselleştirilmiş egzersiz ve diyet planı alın.</p>
 
     <div class="row">
         <div class="col-md-8">
@@ -14,10 +14,42 @@
                     <h4>Bilgilerinizi Girin</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Index" method="post">
+                    <form asp-action="Index" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                        <!-- Method Selection -->
                         <div class="mb-4">
+                            <h5>📋 Öneri Alma Yöntemi</h5>
+                            <div class="btn-group w-100" role="group">
+                                @if (Model.RecommendationMethod == "text" || string.IsNullOrEmpty(Model.RecommendationMethod))
+                                {
+                                    <input type="radio" class="btn-check" name="RecommendationMethod" id="methodText" value="text" checked>
+                                    <label class="btn btn-outline-primary" for="methodText">
+                                        <i class="bi bi-pencil"></i> Bilgi Girerek
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="RecommendationMethod" id="methodPhoto" value="photo">
+                                    <label class="btn btn-outline-primary" for="methodPhoto">
+                                        <i class="bi bi-camera"></i> Fotoğraf Yükleyerek
+                                    </label>
+                                }
+                                else
+                                {
+                                    <input type="radio" class="btn-check" name="RecommendationMethod" id="methodText" value="text">
+                                    <label class="btn btn-outline-primary" for="methodText">
+                                        <i class="bi bi-pencil"></i> Bilgi Girerek
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="RecommendationMethod" id="methodPhoto" value="photo" checked>
+                                    <label class="btn btn-outline-primary" for="methodPhoto">
+                                        <i class="bi bi-camera"></i> Fotoğraf Yükleyerek
+                                    </label>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Text Input Method -->
+                        <div id="textInputSection" class="mb-4" style="display: @(Model.RecommendationMethod == "photo" ? "none" : "block");">
                             <h5>📏 Vücut Ölçülerinizi Girin</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -51,6 +83,20 @@
                             </div>
                         </div>
 
+                        <!-- Photo Upload Method -->
+                        <div id="photoInputSection" class="mb-4" style="display: @(Model.RecommendationMethod == "photo" ? "block" : "none");">
+                            <h5>📷 Fotoğrafınızı Yükleyin</h5>
+                            <div class="mb-3">
+                                <label asp-for="Photo" class="form-label">Vücut Fotoğrafı</label>
+                                <input asp-for="Photo" type="file" class="form-control" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" />
+                                <small class="form-text text-muted">Desteklenen formatlar: JPG, PNG, GIF, WEBP (Maksimum 10MB)</small>
+                                <span asp-validation-for="Photo" class="text-danger"></span>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> <strong>Not:</strong> Fotoğrafınız analiz edilerek size özel egzersiz ve diyet önerileri oluşturulacaktır. Fotoğrafınız güvenli bir şekilde işlenir ve saklanmaz.
+                            </div>
+                        </div>
+
                         @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                         {
                             <div class="alert alert-danger">
@@ -73,9 +119,10 @@
                 <div class="card-body">
                     <h5>💡 Nasıl Çalışır?</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2">📏 <strong>Ölçüler:</strong> Boy, kilo ve vücut tipinizi girin.</li>
-                        <li class="mb-2">🎯 <strong>Hedefler:</strong> Kilo vermek, kas yapmak veya form korumak gibi amacınızı yazın.</li>
-                        <li class="mb-2">🤖 <strong>AI Analiz:</strong> Google Gemini modeli bilgilerinizi analiz eder ve size uygun bir plan üretir.</li>
+                        <li class="mb-2">📋 <strong>Yöntem Seçimi:</strong> Bilgilerinizi manuel girebilir veya fotoğraf yükleyebilirsiniz.</li>
+                        <li class="mb-2">📏 <strong>Bilgi Girişi:</strong> Boy, kilo, vücut tipi ve fitness hedeflerinizi girin.</li>
+                        <li class="mb-2">📷 <strong>Fotoğraf Yükleme:</strong> Vücut fotoğrafınızı yükleyin, AI analiz edecek.</li>
+                        <li class="mb-2">🤖 <strong>AI Analiz:</strong> Google Gemini modeli bilgilerinizi/fotoğrafınızı analiz eder ve size uygun bir plan üretir.</li>
                         <li class="mb-2">💪 <strong>Sonuç:</strong> Günlük egzersiz planı ve örnek bir beslenme listesi alırsınız.</li>
                     </ul>
                 </div>
@@ -125,5 +172,31 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const methodText = document.getElementById('methodText');
+            const methodPhoto = document.getElementById('methodPhoto');
+            const textInputSection = document.getElementById('textInputSection');
+            const photoInputSection = document.getElementById('photoInputSection');
+
+            function toggleSections() {
+                if (methodText && methodText.checked) {
+                    textInputSection.style.display = 'block';
+                    photoInputSection.style.display = 'none';
+                } else if (methodPhoto && methodPhoto.checked) {
+                    textInputSection.style.display = 'none';
+                    photoInputSection.style.display = 'block';
+                }
+            }
+
+            if (methodText && methodPhoto) {
+                methodText.addEventListener('change', toggleSections);
+                methodPhoto.addEventListener('change', toggleSections);
+                
+                // Initialize on page load
+                toggleSections();
+            }
+        });
+    </script>
 }
 

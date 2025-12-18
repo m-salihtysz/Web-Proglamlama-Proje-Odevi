@@ -24,19 +24,26 @@ namespace FitnessCenter.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(AIRecommendationViewModel viewModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(viewModel);
-            }
-
             try
             {
-                if (!viewModel.Height.HasValue || !viewModel.Weight.HasValue)
+                // Check if photo upload method is selected
+                if (viewModel.RecommendationMethod == "photo" && viewModel.Photo != null && viewModel.Photo.Length > 0)
                 {
-                    viewModel.ErrorMessage = "Lütfen boy ve kilo bilgilerinizi girin.";
-                    return View(viewModel);
+                    // Use photo upload method
+                    var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsFromPhotoAsync(viewModel.Photo);
+                    viewModel.ExerciseRecommendations = exerciseRecs;
+                    viewModel.DietSuggestions = dietRecs;
                 }
+                else if (viewModel.RecommendationMethod == "text")
+                {
+                    // Validate text input method
+                    if (!viewModel.Height.HasValue || !viewModel.Weight.HasValue)
+                    {
+                        viewModel.ErrorMessage = "Lütfen boy ve kilo bilgilerinizi girin.";
+                        return View(viewModel);
+                    }
 
+                    // Use text input method
                     var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsAsync(
                         viewModel.Height, 
                         viewModel.Weight, 
@@ -44,6 +51,11 @@ namespace FitnessCenter.Web.Controllers
                         viewModel.FitnessGoals);
                     viewModel.ExerciseRecommendations = exerciseRecs;
                     viewModel.DietSuggestions = dietRecs;
+                }
+                else
+                {
+                    viewModel.ErrorMessage = "Lütfen bilgilerinizi girin veya bir fotoğraf yükleyin.";
+                }
             }
             catch (Exception ex)
             {

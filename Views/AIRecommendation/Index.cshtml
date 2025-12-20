@@ -133,6 +133,40 @@
     @if (!string.IsNullOrEmpty(Model.ExerciseRecommendations) || !string.IsNullOrEmpty(Model.DietSuggestions))
     {
         <div class="row mt-4">
+            <!-- Fotoğraf Bölümü (Sadece fotoğraf yüklendiyse göster) -->
+            @if (!string.IsNullOrEmpty(Model.OriginalPhotoBase64) || !string.IsNullOrEmpty(Model.FitPhotoBase64))
+            {
+                <div class="col-12 mb-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h4>📸 Fotoğraf Analizi</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @if (!string.IsNullOrEmpty(Model.OriginalPhotoBase64))
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <h5>Orijinal Fotoğraf</h5>
+                                        <img src="data:image/jpeg;base64,@Model.OriginalPhotoBase64" alt="Orijinal Fotoğraf" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: contain;" />
+                                    </div>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(Model.FitPhotoBase64))
+                                {
+                                    <div class="col-md-7 mb-3">
+                                        <h5>🎯 Fit Haliniz (İyileştirilmiş)</h5>
+                                        <img src="data:image/jpeg;base64,@Model.FitPhotoBase64" 
+                                             alt="Fit Fotoğraf" 
+                                             class="img-fluid rounded shadow" 
+                                             style="max-height: 400px; width: 120%; object-fit: contain; border: 3px solid #28a745;" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             @if (!string.IsNullOrEmpty(Model.ExerciseRecommendations))
             {
                 <div class="col-md-6 mb-4">

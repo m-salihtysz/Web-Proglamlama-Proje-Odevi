@@ -29,6 +29,10 @@ namespace FitnessCenter.Web.ViewModels
         public string? ExerciseRecommendations { get; set; }
         public string? DietSuggestions { get; set; }
         public string? ErrorMessage { get; set; }
+        
+        // Fit fotoğrafı için (base64 string olarak saklanacak)
+        public string? FitPhotoBase64 { get; set; }
+        public string? OriginalPhotoBase64 { get; set; }
     }
 }
 

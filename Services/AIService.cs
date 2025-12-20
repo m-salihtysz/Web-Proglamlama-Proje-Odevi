@@ -2,6 +2,9 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace FitnessCenter.Web.Services
 {
@@ -60,6 +63,61 @@ namespace FitnessCenter.Web.Services
                 case JsonValueKind.Null:
                 default:
                     return element.ToString();
+            }
+        }
+
+        private string? EnhancePhotoForFitness(string base64Image)
+        {
+            try
+            {
+                // Base64'ten byte array'e çevir
+                var imageBytes = Convert.FromBase64String(base64Image);
+                
+                using (var image = Image.Load(imageBytes))
+                {
+                    var originalWidth = image.Width;
+                    var originalHeight = image.Height;
+                    
+                    // Genişletme faktörleri: yana %15, üste %10 daha iri
+                    var newWidth = (int)(originalWidth * 1.15f);  // %15 daha geniş
+                    var newHeight = (int)(originalHeight * 1.10f); // %10 daha yüksek
+                    
+                    // Fit görünüm için görüntü iyileştirmeleri
+                    image.Mutate(x =>
+                    {
+                        // Önce görüntüyü genişlet (yana %15, üste %10 daha iri)
+                        x.Resize(new ResizeOptions
+                        {
+                            Size = new Size(newWidth, newHeight),
+                            Mode = ResizeMode.Stretch, // Orijinal oranı korumadan genişlet
+                            Sampler = KnownResamplers.Lanczos3 // Yüksek kaliteli resize
+                        });
+                        
+                        // Kontrast artır (daha belirgin görünüm)
+                        x.Contrast(1.2f);
+                        
+                        // Parlaklık artır (özellikle üst kısım için)
+                        x.Brightness(1.1f);
+                        
+                        // Doygunluk artır (daha canlı renkler)
+                        x.Saturate(1.2f);
+                        
+                        // Keskinleştirme (daha net görünüm)
+                        x.GaussianSharpen(1.0f);
+                    });
+                    
+                    // JPEG olarak kaydet (yüksek kalite)
+                    using (var ms = new MemoryStream())
+                    {
+                        image.Save(ms, new JpegEncoder { Quality = 95 });
+                        return Convert.ToBase64String(ms.ToArray());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error enhancing photo for fitness");
+                return null;
             }
         }
 
@@ -406,7 +464,7 @@ namespace FitnessCenter.Web.Services
             }
         }
 
-        public async Task<(string ExerciseRecommendations, string DietSuggestions)> GetRecommendationsFromPhotoAsync(IFormFile photo)
+        public async Task<(string ExerciseRecommendations, string DietSuggestions, string? FitPhotoBase64, string? OriginalPhotoBase64)> GetRecommendationsFromPhotoAsync(IFormFile photo)
         {
             try
             {
@@ -414,13 +472,15 @@ namespace FitnessCenter.Web.Services
                 if (string.IsNullOrEmpty(apiKey) || apiKey == "your-google-ai-api-key-here" || apiKey.StartsWith("your-"))
                 {
                     return ("⚠️ Google AI (Gemini) API anahtarı yapılandırılmamış. Lütfen appsettings.json dosyasına geçerli bir API anahtarı ekleyin. API anahtarı almak için: https://aistudio.google.com/app/apikey", 
-                           "⚠️ Google AI (Gemini) API anahtarı yapılandırılmamış. Lütfen appsettings.json dosyasına geçerli bir API anahtarı ekleyin. API anahtarı almak için: https://aistudio.google.com/app/apikey");
+                           "⚠️ Google AI (Gemini) API anahtarı yapılandırılmamış. Lütfen appsettings.json dosyasına geçerli bir API anahtarı ekleyin. API anahtarı almak için: https://aistudio.google.com/app/apikey",
+                           null, null);
                 }
 
                 if (photo == null || photo.Length == 0)
                 {
                     return ("❌ Fotoğraf yüklenemedi. Lütfen geçerli bir fotoğraf seçin.", 
-                           "❌ Fotoğraf yüklenemedi. Lütfen geçerli bir fotoğraf seçin.");
+                           "❌ Fotoğraf yüklenemedi. Lütfen geçerli bir fotoğraf seçin.",
+                           null, null);
                 }
 
                 // Validate image file
@@ -429,16 +489,23 @@ namespace FitnessCenter.Web.Services
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     return ("❌ Desteklenmeyen dosya formatı. Lütfen JPG, PNG, GIF veya WEBP formatında bir fotoğraf yükleyin.", 
-                           "❌ Desteklenmeyen dosya formatı. Lütfen JPG, PNG, GIF veya WEBP formatında bir fotoğraf yükleyin.");
+                           "❌ Desteklenmeyen dosya formatı. Lütfen JPG, PNG, GIF veya WEBP formatında bir fotoğraf yükleyin.",
+                           null, null);
                 }
 
                 // Convert image to base64
                 string base64Image;
+                string originalPhotoBase64;
+                string? fitPhotoBase64 = null;
                 using (var memoryStream = new MemoryStream())
                 {
                     await photo.CopyToAsync(memoryStream);
                     var imageBytes = memoryStream.ToArray();
                     base64Image = Convert.ToBase64String(imageBytes);
+                    originalPhotoBase64 = base64Image; // Orijinal fotoğrafı sakla
+                    
+                    // Fit fotoğraf için görüntüyü işle (keskinleştir, efekt ekle)
+                    fitPhotoBase64 = EnhancePhotoForFitness(base64Image);
                 }
 
                 // Determine MIME type
@@ -572,7 +639,8 @@ namespace FitnessCenter.Web.Services
                 if (string.IsNullOrEmpty(fullModelName) || string.IsNullOrEmpty(workingVersion))
                 {
                     return ("❌ Hiçbir çalışan Gemini modeli bulunamadı. Lütfen API anahtarınızın doğru olduğundan ve Gemini API'nin aktif olduğundan emin olun.", 
-                           "❌ Hiçbir çalışan Gemini modeli bulunamadı. Lütfen API anahtarınızın doğru olduğundan ve Gemini API'nin aktif olduğundan emin olun.");
+                           "❌ Hiçbir çalışan Gemini modeli bulunamadı. Lütfen API anahtarınızın doğru olduğundan ve Gemini API'nin aktif olduğundan emin olun.",
+                           null, originalPhotoBase64);
                 }
                 
                 // Build request with image
@@ -682,7 +750,10 @@ namespace FitnessCenter.Web.Services
                                     dietRecs = "Diyet önerileri mevcut değil.";
                                 }
                                 
-                                return (exerciseRecs, dietRecs);
+                                // Fit fotoğrafı zaten görüntü işleme ile oluşturuldu (keskinleştirme, efektler)
+                                // Eğer görüntü işleme başarısız olduysa null olacak
+                                
+                                return (exerciseRecs, dietRecs, fitPhotoBase64, originalPhotoBase64);
                             }
                             catch
                             {
@@ -711,7 +782,10 @@ namespace FitnessCenter.Web.Services
                                     dietRecs = partsArray.Length > 1 ? partsArray[1].Trim() : "Diyet önerileri mevcut değil.";
                                 }
                                 
-                                return (exerciseRecs, dietRecs);
+                                // Fit fotoğrafı zaten görüntü işleme ile oluşturuldu (keskinleştirme, efektler)
+                                // Eğer görüntü işleme başarısız olduysa null olacak
+                                
+                                return (exerciseRecs, dietRecs, fitPhotoBase64, originalPhotoBase64);
                             }
                         }
                     }
@@ -724,7 +798,8 @@ namespace FitnessCenter.Web.Services
                         response.StatusCode == System.Net.HttpStatusCode.Forbidden)
                     {
                         return ("❌ Geçersiz API anahtarı. Lütfen appsettings.json dosyasındaki GoogleAI:ApiKey değerini kontrol edin. API anahtarı almak için: https://aistudio.google.com/app/apikey", 
-                               "❌ Geçersiz API anahtarı. Lütfen appsettings.json dosyasındaki GoogleAI:ApiKey değerini kontrol edin. API anahtarı almak için: https://aistudio.google.com/app/apikey");
+                               "❌ Geçersiz API anahtarı. Lütfen appsettings.json dosyasındaki GoogleAI:ApiKey değerini kontrol edin. API anahtarı almak için: https://aistudio.google.com/app/apikey",
+                               null, originalPhotoBase64);
                     }
                     
                     if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests || 
@@ -733,15 +808,18 @@ namespace FitnessCenter.Web.Services
                         (responseContent?.Contains("quota") == true))
                     {
                         return ("⚠️ API kotası dolmuş veya ücretsiz tier limitine ulaşıldı. Lütfen birkaç dakika bekleyip tekrar deneyin. Kullanım limitlerinizi kontrol etmek için: https://ai.dev/usage?tab=rate-limit", 
-                               "⚠️ API kotası dolmuş veya ücretsiz tier limitine ulaşıldı. Lütfen birkaç dakika bekleyip tekrar deneyin. Kullanım limitlerinizi kontrol etmek için: https://ai.dev/usage?tab=rate-limit");
+                               "⚠️ API kotası dolmuş veya ücretsiz tier limitine ulaşıldı. Lütfen birkaç dakika bekleyip tekrar deneyin. Kullanım limitlerinizi kontrol etmek için: https://ai.dev/usage?tab=rate-limit",
+                               null, originalPhotoBase64);
                     }
                     
                     var errorMsg = !string.IsNullOrEmpty(responseContent) ? responseContent : "Bilinmeyen hata";
-                    return ($"❌ API Hatası: {response.StatusCode} - {errorMsg}", $"❌ API Hatası: {response.StatusCode} - {errorMsg}");
+                    return ($"❌ API Hatası: {response.StatusCode} - {errorMsg}", $"❌ API Hatası: {response.StatusCode} - {errorMsg}",
+                           null, originalPhotoBase64);
                 }
 
                 return ("Öneriler oluşturulamadı. Lütfen tekrar deneyin.", 
-                       "Öneriler oluşturulamadı. Lütfen tekrar deneyin.");
+                       "Öneriler oluşturulamadı. Lütfen tekrar deneyin.",
+                       null, originalPhotoBase64);
             }
             catch (Exception ex)
             {
@@ -750,16 +828,18 @@ namespace FitnessCenter.Web.Services
                 if (ex.Message.Contains("401") || ex.Message.Contains("403"))
                 {
                     return ("❌ Geçersiz API anahtarı. Lütfen appsettings.json dosyasındaki GoogleAI:ApiKey değerini kontrol edin. API anahtarı almak için: https://aistudio.google.com/app/apikey", 
-                           "❌ Geçersiz API anahtarı. Lütfen appsettings.json dosyasındaki GoogleAI:ApiKey değerini kontrol edin. API anahtarı almak için: https://aistudio.google.com/app/apikey");
+                           "❌ Geçersiz API anahtarı. Lütfen appsettings.json dosyasındaki GoogleAI:ApiKey değerini kontrol edin. API anahtarı almak için: https://aistudio.google.com/app/apikey",
+                           null, null);
                 }
                 
                 if (ex.Message.Contains("quota") || ex.Message.Contains("429") || ex.Message.Contains("RESOURCE_EXHAUSTED") || ex.Message.Contains("TooManyRequests"))
                 {
                     return ("⚠️ API kotası dolmuş veya ücretsiz tier limitine ulaşıldı. Lütfen birkaç dakika bekleyip tekrar deneyin. Kullanım limitlerinizi kontrol etmek için: https://ai.dev/usage?tab=rate-limit", 
-                           "⚠️ API kotası dolmuş veya ücretsiz tier limitine ulaşıldı. Lütfen birkaç dakika bekleyip tekrar deneyin. Kullanım limitlerinizi kontrol etmek için: https://ai.dev/usage?tab=rate-limit");
+                           "⚠️ API kotası dolmuş veya ücretsiz tier limitine ulaşıldı. Lütfen birkaç dakika bekleyip tekrar deneyin. Kullanım limitlerinizi kontrol etmek için: https://ai.dev/usage?tab=rate-limit",
+                           null, null);
                 }
                 
-                return ($"❌ Hata: {ex.Message}", $"❌ Hata: {ex.Message}");
+                return ($"❌ Hata: {ex.Message}", $"❌ Hata: {ex.Message}", null, null);
             }
         }
 

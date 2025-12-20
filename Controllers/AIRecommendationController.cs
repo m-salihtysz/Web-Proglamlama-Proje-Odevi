@@ -30,9 +30,11 @@ namespace FitnessCenter.Web.Controllers
                 if (viewModel.RecommendationMethod == "photo" && viewModel.Photo != null && viewModel.Photo.Length > 0)
                 {
                     // Use photo upload method
-                    var (exerciseRecs, dietRecs) = await _aiService.GetRecommendationsFromPhotoAsync(viewModel.Photo);
+                    var (exerciseRecs, dietRecs, fitPhotoBase64, originalPhotoBase64) = await _aiService.GetRecommendationsFromPhotoAsync(viewModel.Photo);
                     viewModel.ExerciseRecommendations = exerciseRecs;
                     viewModel.DietSuggestions = dietRecs;
+                    viewModel.FitPhotoBase64 = fitPhotoBase64;
+                    viewModel.OriginalPhotoBase64 = originalPhotoBase64;
                 }
                 else if (viewModel.RecommendationMethod == "text")
                 {
